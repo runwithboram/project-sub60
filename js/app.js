@@ -35,6 +35,7 @@ function saveWorkout() {
 
     const timeInput =
     document.getElementById("time").value;
+    document.getElementById("time").value = time;
 
 const time =
     formatTime(timeInput);
