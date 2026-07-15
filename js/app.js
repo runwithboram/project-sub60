@@ -1,1 +1,11 @@
+document.addEventListener(
 
+    "DOMContentLoaded",
+
+    ()=>{
+
+        renderApp();
+
+    }
+
+);
