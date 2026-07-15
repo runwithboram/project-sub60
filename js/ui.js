@@ -16,11 +16,15 @@ function renderHero() {
 
     return `
         <header class="hero">
-            <span class="greeting">☀️ Good Morning</span>
+
+            <span class="greeting">
+                ☀️ Good Morning
+            </span>
 
             <h1>Road to SUB60</h1>
 
             <p>${appData.user.goal}</p>
+
         </header>
     `;
 
@@ -42,35 +46,65 @@ function renderToday() {
                 ${appData.today.distance} km
             </p>
 
-            <button id="startBtn" class="primary-btn">
+            <button
+                id="startBtn"
+                class="primary-btn">
+
                 START
+
             </button>
 
-            <div id="logForm" class="hidden">
+            <div
+                id="logForm"
+                class="hidden">
 
                 <input
                     id="distance"
                     type="number"
-                    placeholder="거리(km)"
-                >
+                    step="0.1"
+                    placeholder="거리 (km)">
 
                 <input
                     id="time"
                     type="text"
-                    placeholder="시간 (00:45:30)"
-                >
+                    inputmode="numeric"
+                    maxlength="6"
+                    placeholder="시간 (예: 5120)">
 
-                <input
-                    id="pace"
-                    type="text"
-                    placeholder="평균 페이스"
-                >
+                <div class="preview">
+
+                    <p>
+
+                        ⏱ 시간
+
+                        <strong id="timePreview">
+
+                            -
+
+                        </strong>
+
+                    </p>
+
+                    <p>
+
+                        ⚡ 평균 페이스
+
+                        <strong id="pacePreview">
+
+                            -
+
+                        </strong>
+
+                    </p>
+
+                </div>
 
                 <button
                     id="saveRun"
-                    class="primary-btn"
-                >
+                    class="primary-btn">
+
                     저장
+
                 </button>
 
             </div>
@@ -87,7 +121,11 @@ function renderProgress() {
 
         <section class="card">
 
-            <h2>📈 Weekly Progress</h2>
+            <h2>
+
+                📈 Weekly Progress
+
+            </h2>
 
             <strong>
 
@@ -115,7 +153,11 @@ function renderRace() {
 
         <section class="card">
 
-            <h2>🏁 Next Race</h2>
+            <h2>
+
+                🏁 Next Race
+
+            </h2>
 
             <strong>
 
@@ -143,7 +185,11 @@ function renderCoach() {
 
         <section class="card">
 
-            <h2>🤖 Coach</h2>
+            <h2>
+
+                🤖 Coach
+
+            </h2>
 
             <p>
 
