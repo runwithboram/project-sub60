@@ -52,8 +52,8 @@ const appData = {
             target:"59:59"
         }
 
-    ]
+        ],
 
-}
+    logs: []
 
-logs: []
+};
