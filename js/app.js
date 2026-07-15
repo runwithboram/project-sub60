@@ -1,11 +1,21 @@
-document.addEventListener(
+document.addEventListener("DOMContentLoaded", () => {
 
-    "DOMContentLoaded",
+    renderApp();
 
-    ()=>{
+    initEvents();
 
-        renderApp();
+});
 
-    }
+function initEvents(){
 
-);
+    const startBtn=document.getElementById("startBtn");
+
+    const logForm=document.getElementById("logForm");
+
+    startBtn.addEventListener("click",()=>{
+
+        logForm.classList.toggle("hidden");
+
+    });
+
+}
