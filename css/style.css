@@ -761,3 +761,32 @@ body{
     box-sizing:border-box;
 }
 
+.preview{
+    margin:18px 0;
+    padding:14px;
+    background:#f7f8fb;
+    border-radius:14px;
+}
+
+.preview p{
+    display:flex;
+    justify-content:space-between;
+    margin:8px 0;
+    font-size:15px;
+}
+
+.primary-btn{
+    width:100%;
+    padding:14px;
+    margin-top:14px;
+    border:none;
+    border-radius:14px;
+    background:#111827;
+    color:#fff;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.hidden{
+    display:none;
+}
