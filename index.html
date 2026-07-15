@@ -1,434 +1,604 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Project SUB60</title>
 
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-}
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-body{
-background:#0f1115;
-color:white;
-padding:20px;
-}
+<title>Road to SUB60</title>
 
-.container{
-max-width:430px;
-margin:auto;
-}
+<link rel="stylesheet" href="style.css">
 
-.card{
-background:#1a1d24;
-border-radius:24px;
-padding:20px;
-margin-bottom:18px;
-box-shadow:0 8px 20px rgba(0,0,0,.25);
-}
-
-h1{
-font-size:34px;
-font-weight:700;
-}
-
-.sub{
-color:#8d95a6;
-margin-top:6px;
-}
-
-.dday{
-font-size:42px;
-font-weight:800;
-margin-top:12px;
-color:#4fd1ff;
-}
-
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:14px;
-margin-top:16px;
-}
-
-.stat{
-background:#232833;
-border-radius:18px;
-padding:18px;
-text-align:center;
-}
-
-.stat small{
-display:block;
-color:#98a1b2;
-margin-bottom:8px;
-}
-
-.stat h2{
-font-size:26px;
-}
-
-.race{
-display:flex;
-align-items:center;
-margin-top:14px;
-}
-
-.dot{
-width:12px;
-height:12px;
-border-radius:50%;
-margin-right:12px;
-}
-
-.green{background:#3ad67d;}
-.blue{background:#4ea8ff;}
-.orange{background:#ffb347;}
-.red{background:#ff6262;}
-
-.progress{
-height:14px;
-background:#2c3340;
-border-radius:20px;
-overflow:hidden;
-margin-top:16px;
-}
-
-.fill{
-height:100%;
-width:32%;
-background:linear-gradient(90deg,#39d98a,#4ea8ff);
-}
-
-.week{
-margin-top:12px;
-}
-
-.item{
-display:flex;
-justify-content:space-between;
-padding:10px 0;
-border-bottom:1px solid #2b313d;
-}
-
-input[type=checkbox]{
-width:22px;
-height:22px;
-accent-color:#4ea8ff;
-}
-
-.footer{
-text-align:center;
-color:#8a93a6;
-margin:25px 0;
-font-size:13px;
-}
-</style>
+<link
+href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+rel="stylesheet">
 
 </head>
 
 <body>
 
-<div class="container">
+<div class="app">
 
-<div class="card">
+<header class="hero">
 
-<h1>🏃 Project SUB60</h1>
+<div class="hero-top">
 
-<p class="sub">
-Road to 59:59
+<span class="greeting">
+☀️ Good Morning
+</span>
+
+</div>
+
+<h1>
+Road to SUB60
+</h1>
+
+<p class="subtitle">
+
+Every Run Counts.
+
 </p>
+
+<div class="hero-card">
 
 <div class="dday">
+
+<span>D-Day</span>
+
+<h2 id="dday">
 D-52
+</h2>
+
 </div>
 
-<p>
+<div class="next-race">
+
+<span>Next Race</span>
+
+<strong>
+
 설레임런 10K
+
+</strong>
+
+</div>
+
+</div>
+
+</header>
+
+<section class="card">
+
+<div class="card-title">
+
+Today's Mission
+
+</div>
+
+<div class="mission">
+
+<div class="mission-icon">
+
+🏊
+
+</div>
+
+<div>
+
+<h3>
+
+Swimming
+
+</h3>
+
+<p>
+
+45min · Technique
+
 </p>
 
 </div>
 
-<div class="grid">
+<button>
 
-<div class="stat">
+START
 
-<small>10K PB</small>
-
-<h2>1:02:17</h2>
+</button>
 
 </div>
 
-<div class="stat">
+</section>
 
-<small>Half PB</small>
+<section class="card">
 
-<h2>2:17:59</h2>
+<div class="card-title">
 
-</div>
-
-<div class="stat">
-
-<small>목표</small>
-
-<h2>59:59</h2>
+Weekly Progress
 
 </div>
-
-<div class="stat">
-
-<small>VO₂Max</small>
-
-<h2>42</h2>
-
-</div>
-
-</div>
-
-<div class="card">
-
-<h2>🏁 Race Calendar</h2>
-
-<div class="race">
-
-<div class="dot green"></div>
-
-<div>
-
-<strong>설레임런</strong><br>
-
-<small>2026.09</small>
-
-</div>
-
-</div>
-
-<div class="race">
-
-<div class="dot blue"></div>
-
-<div>
-
-<strong>춘천마라톤 10K</strong><br>
-
-<small>2026.10.25</small>
-
-</div>
-
-</div>
-
-<div class="race">
-
-<div class="dot orange"></div>
-
-<div>
-
-<strong>JTBC 10K</strong><br>
-
-<small>2026.11</small>
-
-</div>
-
-</div>
-
-<div class="race">
-
-<div class="dot red"></div>
-
-<div>
-
-<strong>MBN 서울마라톤 (하프)</strong><br>
-
-<small>2026.11</small>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="card">
-
-<h2>📈 이번 주 진행률</h2>
 
 <div class="progress">
 
-<div class="fill"></div>
+<div class="progress-ring">
+
+72%
 
 </div>
 
-<p style="margin-top:12px;">
-8km / 목표 25km
-</p>
+<div class="progress-info">
 
-</div>
+<strong>
 
-<div class="card">
+18 km
 
-<h2>✅ Weekly Mission</h2>
+</strong>
 
-<div class="week">
+<span>
 
-<div class="item">
+Goal 25 km
 
-<span>월 · 핵심 러닝</span>
-
-<input type="checkbox">
-
-</div>
-
-<div class="item">
-
-<span>화 · 수영</span>
-
-<input type="checkbox">
-
-</div>
-
-<div class="item">
-
-<span>수 · 필라테스</span>
-
-<input type="checkbox">
-
-</div>
-
-<div class="item">
-
-<span>수 · 짧은 러닝</span>
-
-<input type="checkbox">
-
-</div>
-
-<div class="item">
-
-<span>목 · 수영</span>
-
-<input type="checkbox">
-
-</div>
-
-<div class="item">
-
-<span>금 · 필라테스</span>
-
-<input type="checkbox">
-
-</div>
-
-<div class="item">
-
-<span>토 · LSD</span>
-
-<input type="checkbox">
-
-</div>
-
-<div class="item">
-
-<span>일 · 회복</span>
-
-<input type="checkbox">
+</span>
 
 </div>
 
 </div>
 
-</div>
+</section>
 
-<div class="card">
+<section class="card">
 
-<h2>📊 Performance</h2>
+<div class="card-title">
 
-<div class="grid">
-
-<div class="stat">
-
-<small>현재 목표</small>
-
-<h2>SUB60</h2>
+Upcoming Race
 
 </div>
 
-<div class="stat">
+<div class="race-item">
 
-<small>예상기록</small>
+<div>
 
-<h2>61:10</h2>
-
-</div>
+🟢 설레임런
 
 </div>
 
-<p style="margin-top:16px;color:#98a1b2;">
-현재 페이스를 유지하면 설레임런에서 SUB60에 근접할 가능성이 있습니다.
-</p>
+<div>
 
-</div>
-
-<div class="card">
-
-<h2>💬 AI Coach</h2>
-
-<p id="coachMessage">
-이번 주 핵심은 월요일 품질훈련과 토요일 LSD입니다.
-수영과 필라테스를 꾸준히 병행하면 부상 위험을 줄이면서
-10K 기록 향상을 기대할 수 있습니다.
-</p>
-
-</div>
-
-<div class="footer">
-
-Project SUB60<br>
-
-Road to 59:59
+61:10
 
 </div>
 
 </div>
 
-<script>
+<div class="race-item">
 
-const targetDate = new Date("2026-09-05");
+<div>
 
-const today = new Date();
+🔵 춘천 10K
 
-const diff = targetDate - today;
+</div>
 
-const days = Math.ceil(diff / (1000*60*60*24));
+<div>
 
-const dday = document.querySelector(".dday");
+60:30
 
-if(dday){
+</div>
 
-dday.innerHTML="D-"+days;
+</div>
 
-}
+<div class="race-item">
 
-const checks=document.querySelectorAll("input[type=checkbox]");
+<div>
 
-checks.forEach((box,index)=>{
+🟠 JTBC
 
-const key="mission"+index;
+</div>
 
-box.checked=localStorage.getItem(key)==="true";
+<div>
 
-box.addEventListener("change",()=>{
+60:10
 
-localStorage.setItem(key,box.checked);
+</div>
 
-});
+</div>
 
-});
+<div class="race-item">
 
-</script>
+<div>
+
+🔴 MBN
+
+</div>
+
+<div>
+
+59:59
+
+</div>
+
+</div>
+
+</section>
+
+<section class="card">
+
+    <div class="card-title">
+        My Records
+    </div>
+
+    <div class="record-grid">
+
+        <div class="record-card">
+
+            <span>10K PB</span>
+
+            <strong>
+                1:02:17
+            </strong>
+
+        </div>
+
+        <div class="record-card">
+
+            <span>Half PB</span>
+
+            <strong>
+                2:17:59
+            </strong>
+
+        </div>
+
+        <div class="record-card">
+
+            <span>VO₂ Max</span>
+
+            <strong>
+                42
+            </strong>
+
+        </div>
+
+        <div class="record-card">
+
+            <span>Goal</span>
+
+            <strong>
+                SUB60
+            </strong>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="card">
+
+    <div class="card-title">
+
+        Coach
+
+    </div>
+
+    <div class="coach">
+
+        <div class="coach-icon">
+
+            🧠
+
+        </div>
+
+        <div class="coach-message">
+
+            이번 주 핵심은
+            토요일 LSD입니다.
+
+            <br><br>
+
+            수영으로 회복하고
+
+            러닝은 무리하지 않는 것이
+
+            가장 중요합니다.
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="card">
+
+    <div class="card-title">
+
+        Race Timeline
+
+    </div>
+
+    <div class="timeline">
+
+        <div class="timeline-item">
+
+            <div class="dot green"></div>
+
+            <div class="line"></div>
+
+            <div class="timeline-text">
+
+                설레임런
+
+                <span>
+                    10K
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="timeline-item">
+
+            <div class="dot blue"></div>
+
+            <div class="line"></div>
+
+            <div class="timeline-text">
+
+                춘천마라톤
+
+                <span>
+                    10K
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="timeline-item">
+
+            <div class="dot orange"></div>
+
+            <div class="line"></div>
+
+            <div class="timeline-text">
+
+                JTBC
+
+                <span>
+                    10K
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="timeline-item">
+
+            <div class="dot red"></div>
+
+            <div class="timeline-text">
+
+                MBN 서울마라톤
+
+                <span>
+
+                    Half Marathon
+
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="card">
+
+    <div class="card-title">
+
+        Recent Activity
+
+    </div>
+
+    <div class="activity-list">
+
+        <div class="activity-item">
+
+            <div class="activity-left">
+
+                🏃
+
+                <div>
+
+                    <strong>Easy Run</strong>
+
+                    <span>8.2 km</span>
+
+                </div>
+
+            </div>
+
+            <div class="activity-right">
+
+                6'18"
+
+            </div>
+
+        </div>
+
+        <div class="activity-item">
+
+            <div class="activity-left">
+
+                🏊
+
+                <div>
+
+                    <strong>Swimming</strong>
+
+                    <span>45 min</span>
+
+                </div>
+
+            </div>
+
+            <div class="activity-right">
+
+                Recovery
+
+            </div>
+
+        </div>
+
+        <div class="activity-item">
+
+            <div class="activity-left">
+
+                💪
+
+                <div>
+
+                    <strong>Pilates</strong>
+
+                    <span>50 min</span>
+
+                </div>
+
+            </div>
+
+            <div class="activity-right">
+
+                Core
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="card">
+
+    <div class="card-title">
+
+        Weekly Goal
+
+    </div>
+
+    <div class="goal-box">
+
+        <div class="goal-number">
+
+            72%
+
+        </div>
+
+        <div class="goal-bar">
+
+            <div class="goal-fill"></div>
+
+        </div>
+
+        <span>
+
+            18 / 25 km
+
+        </span>
+
+    </div>
+
+</section>
+
+<footer class="bottom-nav">
+
+    <a class="nav-item active">
+
+        <div class="nav-icon">
+
+            🏠
+
+        </div>
+
+        <span>
+
+            Home
+
+        </span>
+
+    </a>
+
+    <a class="nav-item">
+
+        <div class="nav-icon">
+
+            📅
+
+        </div>
+
+        <span>
+
+            Plan
+
+        </span>
+
+    </a>
+
+    <a class="nav-item">
+
+        <div class="nav-icon">
+
+            ➕
+
+        </div>
+
+        <span>
+
+            Log
+
+        </span>
+
+    </a>
+
+    <a class="nav-item">
+
+        <div class="nav-icon">
+
+            📈
+
+        </div>
+
+        <span>
+
+            Stats
+
+        </span>
+
+    </a>
+
+    <a class="nav-item">
+
+        <div class="nav-icon">
+
+            ⚙️
+
+        </div>
+
+        <span>
+
+            More
+
+        </span>
+
+    </a>
+
+</footer>
+
+<script src="script.js"></script>
+
+  </div>
 
 </body>
 
