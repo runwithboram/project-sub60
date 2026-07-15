@@ -1,4 +1,4 @@
-function renderApp(){
+function renderApp() {
 
     const app = document.getElementById("app");
 
@@ -12,43 +12,68 @@ function renderApp(){
 
 }
 
-function renderHero(){
+function renderHero() {
 
     return `
         <header class="hero">
-
-            <span class="greeting">
-                ☀️ Good Morning
-            </span>
+            <span class="greeting">☀️ Good Morning</span>
 
             <h1>Road to SUB60</h1>
 
             <p>${appData.user.goal}</p>
-
         </header>
     `;
 
 }
 
-function renderToday(){
+function renderToday() {
 
     return `
 
         <section class="card">
 
-            <h2>Today's Training</h2>
+            <h2>🏃 Today's Training</h2>
 
             <strong>
-
                 ${appData.today.training}
-
             </strong>
 
             <p>
-
                 ${appData.today.distance} km
-
             </p>
+
+            <button id="startBtn" class="primary-btn">
+                START
+            </button>
+
+            <div id="logForm" class="hidden">
+
+                <input
+                    id="distance"
+                    type="number"
+                    placeholder="거리(km)"
+                >
+
+                <input
+                    id="time"
+                    type="text"
+                    placeholder="시간 (00:45:30)"
+                >
+
+                <input
+                    id="pace"
+                    type="text"
+                    placeholder="평균 페이스"
+                >
+
+                <button
+                    id="saveRun"
+                    class="primary-btn"
+                >
+                    저장
+                </button>
+
+            </div>
 
         </section>
 
@@ -56,17 +81,13 @@ function renderToday(){
 
 }
 
-function renderProgress(){
+function renderProgress() {
 
     return `
 
         <section class="card">
 
-            <h2>
-
-                Weekly Progress
-
-            </h2>
+            <h2>📈 Weekly Progress</h2>
 
             <strong>
 
@@ -74,7 +95,9 @@ function renderProgress(){
 
                 /
 
-                ${appData.weekly.goal} km
+                ${appData.weekly.goal}
+
+                km
 
             </strong>
 
@@ -84,7 +107,7 @@ function renderProgress(){
 
 }
 
-function renderRace(){
+function renderRace() {
 
     const race = appData.races[0];
 
@@ -92,11 +115,7 @@ function renderRace(){
 
         <section class="card">
 
-            <h2>
-
-                Next Race
-
-            </h2>
+            <h2>🏁 Next Race</h2>
 
             <strong>
 
@@ -118,24 +137,17 @@ function renderRace(){
 
 }
 
-function renderCoach(){
+function renderCoach() {
 
     return `
 
         <section class="card">
 
-            <h2>
-
-                Coach
-
-            </h2>
+            <h2>🤖 Coach</h2>
 
             <p>
 
-                오늘은
-
-                Easy Run으로
-
+                오늘은 Easy Run으로
                 컨디션을 유지하세요.
 
             </p>
