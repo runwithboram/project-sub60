@@ -33,8 +33,11 @@ function saveWorkout() {
     const distance =
         parseFloat(document.getElementById("distance").value) || 0;
 
-    const time =
-        document.getElementById("time").value;
+    const timeInput =
+    document.getElementById("time").value;
+
+const time =
+    formatTime(timeInput);
 
     const pace =
         document.getElementById("pace").value;
@@ -99,4 +102,27 @@ function loadData() {
 
     Object.assign(appData, parsed);
 
+}
+
+function formatTime(input) {
+
+    const numbers = input.replace(/\D/g, "");
+
+    if (numbers.length <= 2) {
+        return numbers;
+    }
+
+    if (numbers.length <= 4) {
+
+        const min = numbers.slice(0, numbers.length - 2);
+        const sec = numbers.slice(-2);
+
+        return `${parseInt(min,10)}:${sec}`;
+    }
+
+    const hour = numbers.slice(0, numbers.length - 4);
+    const min = numbers.slice(-4, -2);
+    const sec = numbers.slice(-2);
+
+    return `${parseInt(hour,10)}:${min}:${sec}`;
 }
