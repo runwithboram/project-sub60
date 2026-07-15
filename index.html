@@ -1,19 +1,134 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Project SUB60</title>
 
-<link rel="stylesheet" href="style.css">
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+body{
+background:#0f1115;
+color:white;
+padding:20px;
+}
 
-<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+.container{
+max-width:430px;
+margin:auto;
+}
+
+.card{
+background:#1a1d24;
+border-radius:24px;
+padding:20px;
+margin-bottom:18px;
+box-shadow:0 8px 20px rgba(0,0,0,.25);
+}
+
+h1{
+font-size:34px;
+font-weight:700;
+}
+
+.sub{
+color:#8d95a6;
+margin-top:6px;
+}
+
+.dday{
+font-size:42px;
+font-weight:800;
+margin-top:12px;
+color:#4fd1ff;
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:14px;
+margin-top:16px;
+}
+
+.stat{
+background:#232833;
+border-radius:18px;
+padding:18px;
+text-align:center;
+}
+
+.stat small{
+display:block;
+color:#98a1b2;
+margin-bottom:8px;
+}
+
+.stat h2{
+font-size:26px;
+}
+
+.race{
+display:flex;
+align-items:center;
+margin-top:14px;
+}
+
+.dot{
+width:12px;
+height:12px;
+border-radius:50%;
+margin-right:12px;
+}
+
+.green{background:#3ad67d;}
+.blue{background:#4ea8ff;}
+.orange{background:#ffb347;}
+.red{background:#ff6262;}
+
+.progress{
+height:14px;
+background:#2c3340;
+border-radius:20px;
+overflow:hidden;
+margin-top:16px;
+}
+
+.fill{
+height:100%;
+width:32%;
+background:linear-gradient(90deg,#39d98a,#4ea8ff);
+}
+
+.week{
+margin-top:12px;
+}
+
+.item{
+display:flex;
+justify-content:space-between;
+padding:10px 0;
+border-bottom:1px solid #2b313d;
+}
+
+input[type=checkbox]{
+width:22px;
+height:22px;
+accent-color:#4ea8ff;
+}
+
+.footer{
+text-align:center;
+color:#8a93a6;
+margin:25px 0;
+font-size:13px;
+}
+</style>
 
 </head>
 
@@ -21,92 +136,63 @@ content="width=device-width, initial-scale=1.0">
 
 <div class="container">
 
-<header>
+<div class="card">
 
-<div class="title">
+<h1>🏃 Project SUB60</h1>
 
-<h1>Project SUB60</h1>
-
-<p>Road to 59:59</p>
-
-</div>
+<p class="sub">
+Road to 59:59
+</p>
 
 <div class="dday">
+D-52
+</div>
 
-<h2>D-52</h2>
-
-<p>설레임런 10K</p>
+<p>
+설레임런 10K
+</p>
 
 </div>
 
-</header>
+<div class="grid">
 
+<div class="stat">
 
-<section class="hero">
+<small>10K PB</small>
 
-<h2>
-
-모든 러닝이
-
-59분 59초를 향한 한 걸음
-
-</h2>
-
-<p>Every run counts.</p>
-
-</section>
-
-
-<section class="seasonGoal">
-
-<h3>시즌 목표</h3>
-
-<div class="goalCard">
-
-<div class="gold">
-
-🥇 Gold
-
-<span>
-
-59:59
-
-</span>
+<h2>1:02:17</h2>
 
 </div>
 
-<div class="silver">
+<div class="stat">
 
-🥈 Silver
+<small>Half PB</small>
 
-<span>
-
-60:30~61:00
-
-</span>
+<h2>2:17:59</h2>
 
 </div>
 
-<div class="bronze">
+<div class="stat">
 
-🥉 Bronze
+<small>목표</small>
 
-<span>
+<h2>59:59</h2>
 
-62:17
+</div>
 
-</span>
+<div class="stat">
+
+<small>VO₂Max</small>
+
+<h2>42</h2>
 
 </div>
 
 </div>
 
-</section>
+<div class="card">
 
-
-<section class="calendar">
-
-<h2>Race Calendar</h2>
+<h2>🏁 Race Calendar</h2>
 
 <div class="race">
 
@@ -114,9 +200,9 @@ content="width=device-width, initial-scale=1.0">
 
 <div>
 
-<h4>설레임런 10K</h4>
+<strong>설레임런</strong><br>
 
-<p>2026.09.05</p>
+<small>2026.09</small>
 
 </div>
 
@@ -128,23 +214,9 @@ content="width=device-width, initial-scale=1.0">
 
 <div>
 
-<h4>춘천마라톤 10K</h4>
+<strong>춘천마라톤 10K</strong><br>
 
-<p>2026.10.25</p>
-
-</div>
-
-</div>
-
-<div class="race">
-
-<div class="dot navy"></div>
-
-<div>
-
-<h4>JTBC 10K</h4>
-
-<p>2026.11.01</p>
+<small>2026.10.25</small>
 
 </div>
 
@@ -152,279 +224,212 @@ content="width=device-width, initial-scale=1.0">
 
 <div class="race">
 
-<div class="dot purple"></div>
+<div class="dot orange"></div>
 
 <div>
 
-<h4>MBN 서울마라톤</h4>
+<strong>JTBC 10K</strong><br>
 
-<p>2026.11.15</p>
+<small>2026.11</small>
+
+</div>
+
+</div>
+
+<div class="race">
+
+<div class="dot red"></div>
+
+<div>
+
+<strong>MBN 서울마라톤 (하프)</strong><br>
+
+<small>2026.11</small>
 
 </div>
 
 </div>
 
-</section>
+</div>
 
+<div class="card">
 
+<h2>📈 이번 주 진행률</h2>
 
-<section class="dashboard">
+<div class="progress">
 
-<h2>이번 주 대시보드</h2>
+<div class="fill"></div>
 
-<div class="distanceCard">
+</div>
 
-<h3>
-
-0 km
-
-</h3>
-
-<p>
-
-목표 25 km
-
+<p style="margin-top:12px;">
+8km / 목표 25km
 </p>
 
 </div>
 
-</section>
+<div class="card">
 
+<h2>✅ Weekly Mission</h2>
 
+<div class="week">
 
-<section class="training">
+<div class="item">
 
-<h2>
+<span>월 · 핵심 러닝</span>
 
-Weekly Training Plan
-
-</h2>
-
-<div class="day">
-
-<strong>월</strong>
-
-핵심 러닝
+<input type="checkbox">
 
 </div>
 
-<div class="day">
+<div class="item">
 
-<strong>화</strong>
+<span>화 · 수영</span>
 
-수영
-
-</div>
-
-<div class="day">
-
-<strong>수</strong>
-
-필라테스
-
-<br>
-
-짧은 러닝
+<input type="checkbox">
 
 </div>
 
-<div class="day">
+<div class="item">
 
-<strong>목</strong>
+<span>수 · 필라테스</span>
 
-수영
-
-</div>
-
-<div class="day">
-
-<strong>금</strong>
-
-필라테스
+<input type="checkbox">
 
 </div>
 
-<div class="day">
+<div class="item">
 
-<strong>토</strong>
+<span>수 · 짧은 러닝</span>
 
-LSD
-
-</div>
-
-<div class="day">
-
-<strong>일</strong>
-
-회복
+<input type="checkbox">
 
 </div>
 
-</section>
+<div class="item">
 
+<span>목 · 수영</span>
 
+<input type="checkbox">
 
-<script src="app.js"></script>
+</div>
+
+<div class="item">
+
+<span>금 · 필라테스</span>
+
+<input type="checkbox">
+
+</div>
+
+<div class="item">
+
+<span>토 · LSD</span>
+
+<input type="checkbox">
+
+</div>
+
+<div class="item">
+
+<span>일 · 회복</span>
+
+<input type="checkbox">
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>📊 Performance</h2>
+
+<div class="grid">
+
+<div class="stat">
+
+<small>현재 목표</small>
+
+<h2>SUB60</h2>
+
+</div>
+
+<div class="stat">
+
+<small>예상기록</small>
+
+<h2>61:10</h2>
+
+</div>
+
+</div>
+
+<p style="margin-top:16px;color:#98a1b2;">
+현재 페이스를 유지하면 설레임런에서 SUB60에 근접할 가능성이 있습니다.
+</p>
+
+</div>
+
+<div class="card">
+
+<h2>💬 AI Coach</h2>
+
+<p id="coachMessage">
+이번 주 핵심은 월요일 품질훈련과 토요일 LSD입니다.
+수영과 필라테스를 꾸준히 병행하면 부상 위험을 줄이면서
+10K 기록 향상을 기대할 수 있습니다.
+</p>
+
+</div>
+
+<div class="footer">
+
+Project SUB60<br>
+
+Road to 59:59
+
+</div>
+
+</div>
+
+<script>
+
+const targetDate = new Date("2026-09-05");
+
+const today = new Date();
+
+const diff = targetDate - today;
+
+const days = Math.ceil(diff / (1000*60*60*24));
+
+const dday = document.querySelector(".dday");
+
+if(dday){
+
+dday.innerHTML="D-"+days;
+
+}
+
+const checks=document.querySelectorAll("input[type=checkbox]");
+
+checks.forEach((box,index)=>{
+
+const key="mission"+index;
+
+box.checked=localStorage.getItem(key)==="true";
+
+box.addEventListener("change",()=>{
+
+localStorage.setItem(key,box.checked);
+
+});
+
+});
+
+</script>
 
 </body>
 
 </html>
-
-      <section class="weekly-plan card">
-        <h2>WEEKLY TRAINING PLAN</h2>
-
-        <div class="week-grid">
-
-          <div class="day">
-            <h3>월</h3>
-            <div class="emoji">🏃</div>
-            <strong>핵심 러닝</strong>
-            <p>역치 / 템포 / 인터벌</p>
-            <span class="tag quality">Quality</span>
-          </div>
-
-          <div class="day">
-            <h3>화</h3>
-            <div class="emoji">🏊</div>
-            <strong>수영</strong>
-            <p>기술 · 지구력</p>
-            <span class="tag cross">Cross Training</span>
-          </div>
-
-          <div class="day">
-            <h3>수</h3>
-            <div class="emoji">🧘</div>
-            <strong>필라테스</strong>
-            <p>+</p>
-            <strong>짧은 러닝</strong>
-            <p>4~6km</p>
-            <span class="tag cross">Cross Training</span>
-          </div>
-
-          <div class="day">
-            <h3>목</h3>
-            <div class="emoji">🏊</div>
-            <strong>수영</strong>
-            <p>스피드 / 지구력</p>
-            <span class="tag cross">Cross Training</span>
-          </div>
-
-          <div class="day">
-            <h3>금</h3>
-            <div class="emoji">🧘</div>
-            <strong>필라테스</strong>
-            <p>코어 / 유연성</p>
-            <span class="tag core">Core Stability</span>
-          </div>
-
-          <div class="day">
-            <h3>토</h3>
-            <div class="emoji">🏃</div>
-            <strong>LSD</strong>
-            <p>12~16km</p>
-            <span class="tag endurance">Endurance</span>
-          </div>
-
-          <div class="day">
-            <h3>일</h3>
-            <div class="emoji">🌳</div>
-            <strong>회복 러닝</strong>
-            <p>또는 산책</p>
-            <span class="tag recovery">Recovery</span>
-          </div>
-
-        </div>
-      </section>
-
-      <aside class="record card">
-        <h2>시즌 목표 기록</h2>
-
-        <div class="goal-item">
-          <h3>설레임런 10K</h3>
-          <ul>
-            <li>🥇 59:59</li>
-            <li>🥈 60:30~61:00</li>
-            <li>🥉 62:17</li>
-          </ul>
-        </div>
-
-        <div class="goal-item">
-          <h3>JTBC 10K</h3>
-          <p>59분 안정권</p>
-          <p>가능하면 58분대</p>
-        </div>
-
-        <div class="goal-item">
-          <h3>MBN 서울마라톤</h3>
-          <p>2:15 이내</p>
-          <p>PB 경신</p>
-        </div>
-
-      </aside>
-
-    </section>
-
-    <section class="bottom-grid">
-
-      <div class="card dashboard">
-
-        <h2>이번 주 대시보드</h2>
-
-        <div class="circle">
-
-          <div class="circle-inner">
-
-            <span>0 km</span>
-
-            <small>0%</small>
-
-          </div>
-
-        </div>
-
-        <div class="distance-target">
-
-          목표 거리 25km
-
-        </div>
-
-      </div>
-
-      <div class="card guide">
-
-        <h2>핵심 러닝 가이드</h2>
-
-        <div class="guide-grid">
-
-          <div>
-            <strong>역치런</strong>
-            <p>6:10~6:20/km</p>
-          </div>
-
-          <div>
-            <strong>인터벌</strong>
-            <p>5:20~5:40/km</p>
-          </div>
-
-          <div>
-            <strong>레이스 페이스</strong>
-            <p>5:55~6:00/km</p>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="card lsd">
-
-        <h2>LSD 가이드</h2>
-
-        <p>7:30~8:00/km</p>
-
-        <p>심박 +5bpm 이하</p>
-
-        <p>10 → 16km 점진 증가</p>
-
-      </div>
-
-    </section>
