@@ -726,3 +726,38 @@ body{
 
 }
 
+.primary-btn{
+    width:100%;
+    margin-top:16px;
+    padding:14px;
+    border:none;
+    border-radius:16px;
+    background:#111827;
+    color:white;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.primary-btn:active{
+    transform:scale(.98);
+}
+
+.hidden{
+    display:none;
+}
+
+#logForm{
+    margin-top:20px;
+}
+
+#logForm input{
+    width:100%;
+    padding:14px;
+    margin-bottom:12px;
+    border-radius:14px;
+    border:1px solid #ddd;
+    font-size:16px;
+    box-sizing:border-box;
+}
+
