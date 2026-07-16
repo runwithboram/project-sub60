@@ -1,792 +1,266 @@
-/* ===================================
-   Road to SUB60
-   Version 0.2
-=================================== */
-
-:root{
-
-    --bg:#07111F;
-
-    --bg2:#13233E;
-
-    --card:rgba(255,255,255,.08);
-
-    --border:rgba(255,255,255,.10);
-
-    --white:#ffffff;
-
-    --text:#D7E4FF;
-
-    --sub:#9EB3D1;
-
-    --blue:#5EA8FF;
-
-    --cyan:#55E6FF;
-
-    --green:#47E0A1;
-
-    --orange:#FFB44D;
-
-    --red:#FF6D6D;
-
-    --radius:28px;
-
+* {
+  box-sizing: border-box;
 }
 
-*{
-
-    margin:0;
-
-    padding:0;
-
-    box-sizing:border-box;
-
+:root {
+  --bg: #07111f;
+  --card: #172238;
+  --soft: #21304b;
+  --text: #ffffff;
+  --muted: #9eb0ca;
+  --green: #46d7a3;
+  --blue: #46a8ff;
+  --border: rgba(255, 255, 255, 0.09);
 }
 
-html{
-
-    scroll-behavior:smooth;
-
+html {
+  background: var(--bg);
 }
 
-body{
-
-    background:
-
-    linear-gradient(
-        180deg,
-        var(--bg),
-        var(--bg2)
-    );
-
-    color:var(--white);
-
-    font-family:
-
-    "Inter",
-
+body {
+  margin: 0;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(24, 59, 101, 0.9) 0,
+      transparent 34%
+    ),
+    var(--bg);
+  color: var(--text);
+  font-family:
     -apple-system,
-
     BlinkMacSystemFont,
-
+    "Segoe UI",
     sans-serif;
-
 }
 
-.app{
-
-    max-width:430px;
-
-    margin:auto;
-
-    padding:24px;
-
-    padding-bottom:120px;
-
+button,
+input {
+  font: inherit;
 }
 
-/* ---------------- HERO ---------------- */
-
-.hero{
-
-    margin-bottom:24px;
-
+.app {
+  width: min(100%, 460px);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 20px 18px 42px;
 }
 
-.greeting{
-
-    color:var(--sub);
-
-    font-size:14px;
-
+.hero,
+.card,
+.metrics {
+  border: 1px solid var(--border);
+  border-radius: 26px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.2);
 }
 
-.hero h1{
-
-    margin-top:8px;
-
-    font-size:38px;
-
-    font-weight:800;
-
-}
-
-.subtitle{
-
-    color:var(--sub);
-
-    margin-top:8px;
-
-}
-
-.hero-card{
-
-    margin-top:24px;
-
-    background:
-
-    linear-gradient(
-
+.hero {
+  padding: 26px;
+  margin-bottom: 16px;
+  background: linear-gradient(
     135deg,
-
-    #247BFF,
-
-    #2CD4FF
-
-    );
-
-    border-radius:32px;
-
-    padding:28px;
-
-    box-shadow:
-
-    0 20px 50px
-
-    rgba(0,0,0,.35);
-
+    #1767e8,
+    #22c7e8
+  );
 }
 
-.dday span{
-
-    opacity:.8;
-
+.hero > span {
+  font-size: 14px;
+  opacity: 0.8;
 }
 
-.dday h2{
-
-    font-size:52px;
-
-    margin-top:8px;
-
+.hero h1 {
+  margin: 8px 0 24px;
+  font-size: 42px;
+  line-height: 1;
 }
 
-.next-race{
-
-    margin-top:24px;
-
+.heroRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
 }
 
-.next-race span{
-
-    display:block;
-
-    opacity:.8;
-
-    margin-bottom:6px;
-
+.heroRow div {
+  display: grid;
+  gap: 5px;
 }
 
-.next-race strong{
-
-    font-size:20px;
-
+.heroRow b {
+  font-size: 48px;
 }
 
-/* ---------------- CARD ---------------- */
-
-.card{
-
-    background:var(--card);
-
-    backdrop-filter:blur(18px);
-
-    border:1px solid
-
-    var(--border);
-
-    border-radius:var(--radius);
-
-    padding:22px;
-
-    margin-bottom:18px;
-
+.heroRow small {
+  font-weight: 700;
 }
 
-.card-title{
-
-    font-size:18px;
-
-    font-weight:700;
-
-    margin-bottom:20px;
-
+.heroRow em {
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-style: normal;
+  font-weight: 800;
 }
 
-/* ---------------- MISSION ---------------- */
-
-.mission{
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-between;
-
+.card {
+  margin-bottom: 16px;
+  padding: 20px;
+  background: rgba(23, 34, 56, 0.94);
 }
 
-.mission-icon{
-
-    width:58px;
-
-    height:58px;
-
-    border-radius:18px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    background:
-
-    rgba(255,255,255,.10);
-
-    font-size:28px;
-
+.card h2 {
+  margin: 0 0 16px;
 }
 
-.mission h3{
-
-    font-size:18px;
-
-    margin-bottom:6px;
-
+.card header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.mission p{
-
-    color:var(--sub);
-
-    font-size:14px;
-
+.card header h2 {
+  margin: 0;
 }
 
-.mission button{
-
-    border:none;
-
-    border-radius:18px;
-
-    padding:
-
-    12px 22px;
-
-    background:#ffffff;
-
-    color:#111;
-
-    font-weight:700;
-
-    cursor:pointer;
-
-    transition:.25s;
-
+.card p {
+  line-height: 1.6;
 }
 
-.mission button:hover{
-
-    transform:scale(1.05);
-
+label {
+  display: block;
+  margin-bottom: 13px;
 }
 
-/* ---------------- PROGRESS ---------------- */
-
-.progress{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:24px;
-
+label span {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
 }
 
-.progress-ring{
-
-    width:96px;
-
-    height:96px;
-
-    border-radius:50%;
-
-    background:
-    conic-gradient(
-        var(--green) 72%,
-        rgba(255,255,255,.08) 72%
-    );
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-size:22px;
-
-    font-weight:800;
-
-    position:relative;
-
+input {
+  width: 100%;
+  padding: 15px;
+  border: 0;
+  border-radius: 15px;
+  outline: none;
+  background: #ffffff;
+  color: #111827;
+  font-size: 18px;
 }
 
-.progress-ring::after{
-
-    content:"";
-
-    position:absolute;
-
-    width:72px;
-
-    height:72px;
-
-    border-radius:50%;
-
-    background:#0E1A2E;
-
+input:focus {
+  box-shadow: 0 0 0 3px rgba(70, 168, 255, 0.27);
 }
 
-.progress-ring{
-
-    color:#fff;
-
+.preview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 14px 0;
 }
 
-.progress-ring{
-
-    z-index:1;
-
+.preview > div,
+.metrics > div {
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--soft);
 }
 
-.progress-info strong{
-
-    display:block;
-
-    font-size:28px;
-
+.preview span,
+.metrics span,
+.logs small,
+.muted,
+.card > small {
+  color: var(--muted);
+  font-size: 13px;
 }
 
-.progress-info span{
-
-    color:var(--sub);
-
+.preview b,
+.metrics b {
+  display: block;
+  margin-top: 5px;
 }
 
-/* ---------------- RECORDS ---------------- */
-
-.record-grid{
-
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:14px;
-
+button {
+  width: 100%;
+  padding: 15px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--green);
+  color: #04130e;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
 }
 
-.record-card{
-
-    background:rgba(255,255,255,.05);
-
-    border-radius:20px;
-
-    padding:18px;
-
+button:active {
+  transform: scale(0.985);
 }
 
-.record-card span{
-
-    display:block;
-
-    color:var(--sub);
-
-    margin-bottom:8px;
-
+.track {
+  height: 11px;
+  margin: 14px 0 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
 }
 
-.record-card strong{
-
-    font-size:24px;
-
+.track i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    var(--green),
+    var(--blue)
+  );
 }
 
-/* ---------------- COACH ---------------- */
-
-.coach{
-
-    display:flex;
-
-    gap:18px;
-
-    align-items:flex-start;
-
+.logs {
+  display: grid;
+  gap: 10px;
 }
 
-.coach-icon{
-
-    width:56px;
-
-    height:56px;
-
-    border-radius:18px;
-
-    background:rgba(255,255,255,.08);
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-size:28px;
-
+.logs article {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--soft);
 }
 
-.coach-message{
-
-    line-height:1.7;
-
-    color:var(--text);
-
+.logs article > div {
+  display: grid;
+  gap: 5px;
 }
 
-/* ---------------- TIMELINE ---------------- */
-
-.timeline-item{
-
-    display:flex;
-
-    align-items:flex-start;
-
-    gap:18px;
-
-    position:relative;
-
-    padding-bottom:22px;
-
+.logs article > div:last-child {
+  text-align: right;
 }
 
-.line{
-
-    position:absolute;
-
-    left:7px;
-
-    top:18px;
-
-    width:2px;
-
-    height:42px;
-
-    background:rgba(255,255,255,.15);
-
+.metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 10px;
+  background: rgba(23, 34, 56, 0.94);
 }
 
-.dot{
-
-    width:16px;
-
-    height:16px;
-
-    border-radius:50%;
-
-    flex-shrink:0;
-
-}
-
-.green{background:var(--green);}
-.blue{background:var(--blue);}
-.orange{background:var(--orange);}
-.red{background:var(--red);}
-
-.timeline-text{
-
-    display:flex;
-
-    flex-direction:column;
-
-}
-
-.timeline-text span{
-
-    margin-top:4px;
-
-    color:var(--sub);
-
-    font-size:13px;
-
-}
-
-/* ---------------- ACTIVITY ---------------- */
-
-.activity-item{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    padding:14px 0;
-
-    border-bottom:1px solid rgba(255,255,255,.05);
-
-}
-
-.activity-item:last-child{
-
-    border:none;
-
-}
-
-.activity-left{
-
-    display:flex;
-
-    gap:14px;
-
-    align-items:center;
-
-}
-
-.activity-left strong{
-
-    display:block;
-
-    margin-bottom:4px;
-
-}
-
-.activity-left span{
-
-    color:var(--sub);
-
-    font-size:13px;
-
-}
-
-.activity-right{
-
-    color:var(--cyan);
-
-    font-weight:700;
-
-}
-
-/* ---------------- GOAL ---------------- */
-
-.goal-number{
-
-    font-size:42px;
-
-    font-weight:800;
-
-    margin-bottom:16px;
-
-}
-
-.goal-bar{
-
-    height:12px;
-
-    background:rgba(255,255,255,.08);
-
-    border-radius:999px;
-
-    overflow:hidden;
-
-    margin-bottom:12px;
-
-}
-
-.goal-fill{
-
-    width:72%;
-
-    height:100%;
-
-    background:linear-gradient(
-        90deg,
-        var(--green),
-        var(--cyan)
-    );
-
-}
-
-/* ---------------- NAVIGATION ---------------- */
-
-.bottom-nav{
-
-    position:fixed;
-
-    left:0;
-
-    right:0;
-
-    bottom:0;
-
-    max-width:430px;
-
-    margin:auto;
-
-    background:rgba(10,18,34,.92);
-
-    backdrop-filter:blur(24px);
-
-    display:flex;
-
-    justify-content:space-around;
-
-    padding:16px 10px 22px;
-
-    border-top:1px solid rgba(255,255,255,.08);
-
-}
-
-.nav-item{
-
-    color:var(--sub);
-
-    text-decoration:none;
-
-    display:flex;
-
-    flex-direction:column;
-
-    align-items:center;
-
-    gap:6px;
-
-    font-size:12px;
-
-}
-
-.nav-icon{
-
-    font-size:22px;
-
-}
-
-.nav-item.active{
-
-    color:#fff;
-
-}
-
-/* ---------------- ANIMATION ---------------- */
-
-.card{
-
-    animation:fadeUp .5s ease;
-
-}
-
-@keyframes fadeUp{
-
-    from{
-
-        opacity:0;
-
-        transform:translateY(20px);
-
-    }
-
-    to{
-
-        opacity:1;
-
-        transform:translateY(0);
-
-    }
-
-}
-
-/* ---------------- MOBILE ---------------- */
-
-@media(max-width:430px){
-
-    .app{
-
-        padding:18px;
-
-    }
-
-    .hero h1{
-
-        font-size:32px;
-
-    }
-
-    .dday h2{
-
-        font-size:44px;
-
-    }
-
-}
-
-.primary-btn{
-    width:100%;
-    margin-top:16px;
-    padding:14px;
-    border:none;
-    border-radius:16px;
-    background:#111827;
-    color:white;
-    font-size:16px;
-    font-weight:600;
-    cursor:pointer;
-}
-
-.primary-btn:active{
-    transform:scale(.98);
-}
-
-.hidden{
-    display:none;
-}
-
-#logForm{
-    margin-top:20px;
-}
-
-#logForm input{
-    width:100%;
-    padding:14px;
-    margin-bottom:12px;
-    border-radius:14px;
-    border:1px solid #ddd;
-    font-size:16px;
-    box-sizing:border-box;
-}
-
-.preview{
-    margin:18px 0;
-    padding:14px;
-    background:#f7f8fb;
-    border-radius:14px;
-}
-
-.preview p{
-    display:flex;
-    justify-content:space-between;
-    margin:8px 0;
-    font-size:15px;
-}
-
-.primary-btn{
-    width:100%;
-    padding:14px;
-    margin-top:14px;
-    border:none;
-    border-radius:14px;
-    background:#111827;
-    color:#fff;
-    font-size:16px;
-    cursor:pointer;
-}
-
-.hidden{
-    display:none;
+@media (max-width: 350px) {
+  .preview {
+    grid-template-columns: 1fr;
+  }
+
+  .hero h1 {
+    font-size: 36px;
+  }
+
+  .heroRow b {
+    font-size: 42px;
+  }
 }
