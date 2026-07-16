@@ -33,5 +33,5 @@ function pace(d,t){const s=Math.round(seconds(t)/d),m=Math.floor(s/60);return`${
 function weekRange(){const n=new Date(),day=n.getDay(),o=day===0?-6:1-day,s=new Date(n);s.setDate(n.getDate()+o);s.setHours(0,0,0,0);const e=new Date(s);e.setDate(s.getDate()+7);return{start:s,end:e};}
 function recalcWeek(){const{start,end}=weekRange();appData.weekly.current=round(appData.logs.filter(l=>{const d=new Date(l.date);return d>=start&&d<end;}).reduce((a,l)=>a+Number(l.distance||0),0));}
 function round(v){return Math.round((v+Number.EPSILON)*100)/100;}
-function save(){localStorage.setItem("roadToSub60",JSON.stringify(appData));}
-function load(){const s=localStorage.getItem("roadToSub60");if(!s)return;try{const p=JSON.parse(s);appData.user={...appData.user,...(p.user||{})};appData.weekly={...appData.weekly,...(p.weekly||{})};appData.records={...appData.records,...(p.records||{})};appData.races=Array.isArray(p.races)?p.races:appData.races;appData.logs=Array.isArray(p.logs)?p.logs:[];}catch(e){localStorage.removeItem("roadToSub60");}}
+function save(){localStorage.setItem("roadToSub60_v1",JSON.stringify(appData));}
+function load(){const s=localStorage.getItem("roadToSub60_v1");if(!s)return;try{const p=JSON.parse(s);appData.user={...appData.user,...(p.user||{})};appData.weekly={...appData.weekly,...(p.weekly||{})};appData.records={...appData.records,...(p.records||{})};appData.races=Array.isArray(p.races)?p.races:appData.races;appData.logs=Array.isArray(p.logs)?p.logs:[];}catch(e){localStorage.removeItem("roadToSub60_v1");}}
