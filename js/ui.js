@@ -38,7 +38,26 @@ function renderApp() {
           id="capturePreviewImage"
           alt="선택한 Garmin 캡처 미리보기"
         >
+<button
+  id="analyzeCapture"
+  class="ocr-button"
+  type="button"
+>
+  Garmin 읽기
+</button>
 
+<div
+  id="ocrStatus"
+  class="ocr-status hidden"
+>
+  <span id="ocrStatusText">
+    준비 중...
+  </span>
+
+  <div class="ocr-progress">
+    <i id="ocrProgressBar"></i>
+  </div>
+</div>
         <button
           id="removeCapture"
           class="secondary-button"
