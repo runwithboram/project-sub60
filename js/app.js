@@ -35,7 +35,7 @@ function handleCaptureSelection(event) {
   if (!file) return;
 
   if (!file.type.startsWith("image/")) {
-    alert("ì´ë¯¸ì§ íì¼ì ì íí´ ì£¼ì¸ì.");
+    alert("이미지 파일을 선택해 주세요.");
     event.target.value = "";
     return;
   }
@@ -54,19 +54,21 @@ function handleCaptureSelection(event) {
   if (previewImage) previewImage.src = selectedCaptureUrl;
   previewBox?.classList.remove("hidden");
 
-  updateOcrStatus("Garmin ì½ê¸°ë¥¼ ëë¬ ì£¼ì¸ì.", 0, false);
+  updateOcrStatus("Garmin 읽기를 눌러 주세요.", 0, false);
 }
 
 async function analyzeGarminCapture() {
   if (isAnalyzing) return;
 
   if (!selectedCaptureFile) {
-    alert("Garmin ìì½ ì´ë¯¸ì§ë¥¼ ë¨¼ì  ì íí´ ì£¼ì¸ì.");
+    alert("Garmin 요약 이미지를 먼저 선택해 주세요.");
     return;
   }
 
-  if (typeof Tesseract === "undefined") {
-    alert("OCR ë¼ì´ë¸ë¬ë¦¬ë¥¼ ë¶ë¬ì¤ì§ ëª»íìµëë¤. íì´ì§ë¥¼ ìë¡ê³ ì¹¨í´ ì£¼ì¸ì.");
+  try {
+    await ensureTesseractLoaded();
+  } catch (error) {
+    alert("OCR 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인해 주세요.");
     return;
   }
 
@@ -75,19 +77,19 @@ async function analyzeGarminCapture() {
 
   if (analyzeButton) {
     analyzeButton.disabled = true;
-    analyzeButton.textContent = "Garmin ì½ë ì¤...";
+    analyzeButton.textContent = "Garmin 읽는 중...";
   }
 
   let worker = null;
 
   try {
-    updateOcrStatus("Garmin ìì½ íë©´ íì¸ ì¤...", 5, true);
+    updateOcrStatus("Garmin 요약 화면 확인 중...", 5, true);
 
     const image = await loadImageFile(selectedCaptureFile);
 
     if (!isGarminSummaryRatio(image)) {
       throw new Error(
-        "Garmin ìì½ íë©´ ì ì²´ê° ë³´ì´ë ê°ë¡í ì´ë¯¸ì§ë¥¼ ì íí´ ì£¼ì¸ì."
+        "Garmin 요약 화면 전체가 보이는 가로형 이미지를 선택해 주세요."
       );
     }
 
@@ -97,7 +99,7 @@ async function analyzeGarminCapture() {
       logger(message) {
         if (message.status === "recognizing text") {
           updateOcrStatus(
-            `ì«ì ì½ë ì¤... ${Math.round((message.progress || 0) * 100)}%`,
+            `숫자 읽는 중... ${Math.round((message.progress || 0) * 100)}%`,
             15 + Math.round((message.progress || 0) * 75),
             true
           );
@@ -117,7 +119,7 @@ async function analyzeGarminCapture() {
       const region = regions[index];
 
       updateOcrStatus(
-        `${region.label} ì½ë ì¤...`,
+        `${region.label} 읽는 중...`,
         15 + Math.round((index / regions.length) * 70),
         true
       );
@@ -132,42 +134,42 @@ async function analyzeGarminCapture() {
       avgHeartRate: parseHeartRate(rawResults.heartRate)
     };
 
-    console.log("Garmin OCR ìë¬¸", rawResults);
-    console.log("Garmin ì¶ì¶ ê²°ê³¼", extracted);
+    console.log("Garmin OCR 원문", rawResults);
+    console.log("Garmin 추출 결과", extracted);
 
     applyExtractedData(extracted);
 
     const resultLines = [];
     if (extracted.distance !== null) {
-      resultLines.push(`ê±°ë¦¬ ${extracted.distance}km`);
+      resultLines.push(`거리 ${extracted.distance}km`);
     }
     if (extracted.time) {
-      resultLines.push(`ì´ ìê° ${extracted.time}`);
+      resultLines.push(`총 시간 ${extracted.time}`);
     }
     if (extracted.avgHeartRate !== null) {
-      resultLines.push(`íê·  ì¬ë° ${extracted.avgHeartRate}bpm`);
+      resultLines.push(`평균 심박 ${extracted.avgHeartRate}bpm`);
     }
 
     if (extracted.distance === null || !extracted.time) {
-      updateOcrStatus("ì¼ë¶ ê°ì ì½ì§ ëª»íìµëë¤.", 100, true);
+      updateOcrStatus("일부 값을 읽지 못했습니다.", 100, true);
 
       alert(
-        `ì¸ì ê²°ê³¼\n\n${resultLines.join("\n") || "ì¸ìë ê°ì´ ììµëë¤."}\n\n` +
-        "ê±°ë¦¬ì ìê°ì ì§ì  íì¸í´ ì£¼ì¸ì."
+        `인식 결과\n\n${resultLines.join("\n") || "인식된 값이 없습니다."}\n\n` +
+        "거리와 시간을 직접 확인해 주세요."
       );
       return;
     }
 
-    updateOcrStatus("Garmin ë°ì´í° ì¸ì ìë£", 100, true);
+    updateOcrStatus("Garmin 데이터 인식 완료", 100, true);
 
     alert(
-      `Garmin ì½ê¸° ìë£\n\n${resultLines.join("\n")}\n\n` +
-      "ì ì¥íê¸° ì ì ìë ¥ê°ì íì¸í´ ì£¼ì¸ì."
+      `Garmin 읽기 완료\n\n${resultLines.join("\n")}\n\n` +
+      "저장하기 전에 입력값을 확인해 주세요."
     );
   } catch (error) {
     console.error(error);
-    updateOcrStatus("ì¸ì ì¤í¨", 0, true);
-    alert(error.message || "Garmin íë©´ì ì½ì§ ëª»íìµëë¤.");
+    updateOcrStatus("인식 실패", 0, true);
+    alert(error.message || "Garmin 화면을 읽지 못했습니다.");
   } finally {
     if (worker) {
       await worker.terminate();
@@ -177,22 +179,47 @@ async function analyzeGarminCapture() {
 
     if (analyzeButton) {
       analyzeButton.disabled = false;
-      analyzeButton.textContent = "Garmin ì½ê¸°";
+      analyzeButton.textContent = "Garmin 읽기";
     }
   }
+}
+
+
+function ensureTesseractLoaded() {
+  if (typeof Tesseract !== "undefined") {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve, reject) => {
+    const existing = document.querySelector('script[data-tesseract-loader="true"]');
+
+    if (existing) {
+      existing.addEventListener("load", resolve, { once: true });
+      existing.addEventListener("error", reject, { once: true });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+    script.async = true;
+    script.dataset.tesseractLoader = "true";
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
 }
 
 function loadImageFile(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
-    reader.onerror = () => reject(new Error("ì´ë¯¸ì§ íì¼ì ì½ì§ ëª»íìµëë¤."));
+    reader.onerror = () => reject(new Error("이미지 파일을 읽지 못했습니다."));
 
     reader.onload = () => {
       const image = new Image();
 
       image.onload = () => resolve(image);
-      image.onerror = () => reject(new Error("ì´ë¯¸ì§ë¥¼ ì´ì§ ëª»íìµëë¤."));
+      image.onerror = () => reject(new Error("이미지를 열지 못했습니다."));
       image.src = reader.result;
     };
 
@@ -209,17 +236,17 @@ function createGarminSummaryRegions(image) {
   return [
     {
       key: "distance",
-      label: "ê±°ë¦¬",
+      label: "거리",
       image: cropForOcr(image, 0.025, 0.02, 0.35, 0.20)
     },
     {
       key: "heartRate",
-      label: "íê·  ì¬ë°",
+      label: "평균 심박",
       image: cropForOcr(image, 0.025, 0.39, 0.34, 0.17)
     },
     {
       key: "time",
-      label: "ì´ ìê°",
+      label: "총 시간",
       image: cropForOcr(image, 0.025, 0.70, 0.34, 0.17)
     }
   ];
@@ -422,13 +449,13 @@ function saveWorkout() {
   const formattedTime = formatTime(timeInput?.value || "");
 
   if (!Number.isFinite(distance) || distance <= 0) {
-    alert("ê±°ë¦¬ë¥¼ ìë ¥í´ ì£¼ì¸ì.");
+    alert("거리를 입력해 주세요.");
     distanceInput?.focus();
     return;
   }
 
   if (!validTime(formattedTime)) {
-    alert("ìê°ì ì«ìë¡ ìë ¥í´ ì£¼ì¸ì. ì: 5120 â 51:20");
+    alert("시간을 숫자로 입력해 주세요. 예: 5120 → 51:20");
     timeInput?.focus();
     return;
   }
@@ -452,7 +479,7 @@ function saveWorkout() {
   selectedCaptureFile = null;
 
   alert(
-    `ì ì¥ ìë£\n${log.distance}km Â· ${log.time} Â· ${log.pace}`
+    `저장 완료\n${log.distance}km · ${log.time} · ${log.pace}`
   );
 }
 
@@ -575,3 +602,5 @@ function load() {
       : [];
   } catch (error) {
     localStorage.removeItem("roadToSub60_v1");
+  }
+}
