@@ -2,6 +2,7 @@ function renderApp() {
   const race = getNextRace();
   const pct = getWeeklyPercent();
   const logs = appData.logs.slice(0, 5);
+  const weeklyReport = getWeeklyReport();
 
   document.getElementById("app").innerHTML = `
     <section class="hero">
@@ -38,26 +39,27 @@ function renderApp() {
           id="capturePreviewImage"
           alt="선택한 Garmin 캡처 미리보기"
         >
-<button
-  id="analyzeCapture"
-  class="ocr-button"
-  type="button"
->
-  Garmin 읽기
-</button>
+        <button
+          id="analyzeCapture"
+          class="ocr-button"
+          type="button"
+        >
+          Garmin 읽기
+        </button>
 
-<div
-  id="ocrStatus"
-  class="ocr-status hidden"
->
-  <span id="ocrStatusText">
-    준비 중...
-  </span>
+        <div
+          id="ocrStatus"
+          class="ocr-status hidden"
+        >
+          <span id="ocrStatusText">
+            준비 중...
+          </span>
 
-  <div class="ocr-progress">
-    <i id="ocrProgressBar"></i>
-  </div>
-</div>
+          <div class="ocr-progress">
+            <i id="ocrProgressBar"></i>
+          </div>
+        </div>
+
         <button
           id="removeCapture"
           class="secondary-button"
@@ -124,6 +126,46 @@ function renderApp() {
       </div>
 
       <small>${pct}% 달성</small>
+    </section>
+
+    <section class="card weekly-report">
+      <header class="weekly-report-header">
+        <div>
+          <h2>주간 리포트</h2>
+          <small>${weeklyReport.period}</small>
+        </div>
+
+        <span class="weekly-change ${weeklyReport.changeClass}">
+          ${weeklyReport.changeText}
+        </span>
+      </header>
+
+      <div class="weekly-report-grid">
+        <div>
+          <span>주간 거리</span>
+          <b>${weeklyReport.distance}</b>
+        </div>
+
+        <div>
+          <span>러닝 횟수</span>
+          <b>${weeklyReport.count}</b>
+        </div>
+
+        <div>
+          <span>평균 페이스</span>
+          <b>${weeklyReport.averagePace}</b>
+        </div>
+
+        <div>
+          <span>최장 거리</span>
+          <b>${weeklyReport.longest}</b>
+        </div>
+      </div>
+
+      <div class="weekly-coach">
+        <span>Coach Summary</span>
+        <p>${weeklyReport.summary}</p>
+      </div>
     </section>
 
     <section class="card">
@@ -245,6 +287,187 @@ function getWeeklyPercent() {
       * 100
     )
   );
+}
+
+function getWeeklyReport() {
+  const currentRange = getWeekRangeByOffset(0);
+  const previousRange = getWeekRangeByOffset(-1);
+
+  const currentLogs = logsInRange(currentRange.start, currentRange.end);
+  const previousLogs = logsInRange(previousRange.start, previousRange.end);
+
+  const currentDistance = totalDistance(currentLogs);
+  const previousDistance = totalDistance(previousLogs);
+  const longestDistance = currentLogs.reduce(
+    (max, log) => Math.max(max, Number(log.distance) || 0),
+    0
+  );
+
+  const delta = round(currentDistance - previousDistance);
+  const changeText = getWeeklyChangeText(delta, previousDistance);
+  const changeClass =
+    delta > 0 ? "is-up" :
+    delta < 0 ? "is-down" :
+    "is-same";
+
+  return {
+    period: formatWeekPeriod(currentRange.start, currentRange.end),
+    distance: `${currentDistance.toFixed(1)} km`,
+    count: `${currentLogs.length}회`,
+    averagePace: getAveragePace(currentLogs),
+    longest: currentLogs.length
+      ? `${longestDistance.toFixed(1)} km`
+      : "-",
+    changeText,
+    changeClass,
+    summary: getWeeklySummary({
+      currentLogs,
+      currentDistance,
+      previousDistance,
+      longestDistance
+    })
+  };
+}
+
+function getWeekRangeByOffset(offset) {
+  const now = new Date();
+  const day = now.getDay();
+  const mondayOffset = day === 0 ? -6 : 1 - day;
+
+  const start = new Date(now);
+  start.setDate(now.getDate() + mondayOffset + offset * 7);
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date(start);
+  end.setDate(start.getDate() + 7);
+
+  return { start, end };
+}
+
+function logsInRange(start, end) {
+  return appData.logs.filter(log => {
+    const date = new Date(log.date);
+    return date >= start && date < end;
+  });
+}
+
+function totalDistance(logs) {
+  return round(
+    logs.reduce(
+      (sum, log) => sum + Number(log.distance || 0),
+      0
+    )
+  );
+}
+
+function getAveragePace(logs) {
+  const validLogs = logs.filter(log => {
+    const distance = Number(log.distance);
+    return distance > 0 && validReportTime(log.time);
+  });
+
+  if (!validLogs.length) return "-";
+
+  const distance = validLogs.reduce(
+    (sum, log) => sum + Number(log.distance),
+    0
+  );
+
+  const totalSeconds = validLogs.reduce(
+    (sum, log) => sum + reportTimeToSeconds(log.time),
+    0
+  );
+
+  if (distance <= 0 || totalSeconds <= 0) return "-";
+
+  const paceSeconds = Math.round(totalSeconds / distance);
+  const minutes = Math.floor(paceSeconds / 60);
+  const secondsPart = String(paceSeconds % 60).padStart(2, "0");
+
+  return `${minutes}'${secondsPart}"/km`;
+}
+
+function validReportTime(time) {
+  const parts = String(time || "").split(":").map(Number);
+
+  if (
+    parts.length < 2 ||
+    parts.length > 3 ||
+    parts.some(Number.isNaN)
+  ) {
+    return false;
+  }
+
+  return parts.every((value, index) => {
+    if (index === 0) return value >= 0;
+    return value >= 0 && value < 60;
+  });
+}
+
+function reportTimeToSeconds(time) {
+  const parts = String(time).split(":").map(Number);
+
+  if (parts.length === 2) {
+    return parts[0] * 60 + parts[1];
+  }
+
+  return parts[0] * 3600 + parts[1] * 60 + parts[2];
+}
+
+function getWeeklyChangeText(delta, previousDistance) {
+  if (previousDistance === 0) {
+    return delta > 0 ? "이번 주 시작" : "기록 대기";
+  }
+
+  if (delta > 0) return `지난주보다 +${delta.toFixed(1)} km`;
+  if (delta < 0) return `지난주보다 ${delta.toFixed(1)} km`;
+
+  return "지난주와 동일";
+}
+
+function getWeeklySummary({
+  currentLogs,
+  currentDistance,
+  previousDistance,
+  longestDistance
+}) {
+  if (!currentLogs.length) {
+    return "이번 주 첫 러닝을 기록해 보세요. 짧은 이지런부터 시작해도 충분합니다.";
+  }
+
+  const goal = Number(appData.weekly.goal) || 0;
+  const achievement = goal > 0
+    ? Math.round((currentDistance / goal) * 100)
+    : 0;
+
+  if (achievement >= 100) {
+    return `주간 목표를 달성했습니다. 총 ${currentLogs.length}회 달렸고, 최장 거리는 ${longestDistance.toFixed(1)}km입니다. 다음 러닝은 회복 강도로 조절하세요.`;
+  }
+
+  if (previousDistance > 0 && currentDistance > previousDistance * 1.2) {
+    return `지난주보다 거리가 크게 늘었습니다. 현재 ${achievement}% 달성 중이므로 다음 운동은 강도보다 회복과 부상 예방을 우선하세요.`;
+  }
+
+  if (currentLogs.length >= 3) {
+    return `이번 주 ${currentLogs.length}회 러닝으로 꾸준함이 좋습니다. 목표까지 ${Math.max(0, goal - currentDistance).toFixed(1)}km 남았습니다.`;
+  }
+
+  return `현재 ${achievement}% 달성했습니다. 목표까지 ${Math.max(0, goal - currentDistance).toFixed(1)}km 남았으니 무리하지 않고 나누어 채우세요.`;
+}
+
+function formatWeekPeriod(start, end) {
+  const lastDay = new Date(end);
+  lastDay.setDate(end.getDate() - 1);
+
+  const formatter = new Intl.DateTimeFormat(
+    "ko-KR",
+    {
+      month: "numeric",
+      day: "numeric"
+    }
+  );
+
+  return `${formatter.format(start)} – ${formatter.format(lastDay)}`;
 }
 
 function coach() {
