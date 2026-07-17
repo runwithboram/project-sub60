@@ -359,46 +359,94 @@ button:active {
 .hidden {
   display: none;
 }
-.ocr-button {
-  margin-top: 12px;
-  background: linear-gradient(
-    135deg,
-    #46d7a3,
-    #46a8ff
-  );
-  color: #04130e;
+
+/* Weekly report v1.1 */
+.weekly-report-header {
+  align-items: center !important;
+  margin-bottom: 16px;
 }
 
-.ocr-status {
-  margin-top: 12px;
-  padding: 12px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.06);
+.weekly-report-header > div {
+  display: grid;
+  gap: 5px;
 }
 
-.ocr-status span {
-  display: block;
-  margin-bottom: 8px;
+.weekly-report-header small {
   color: var(--muted);
   font-size: 13px;
 }
 
-.ocr-progress {
-  height: 8px;
-  overflow: hidden;
+.weekly-change {
+  flex-shrink: 0;
+  padding: 7px 10px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
 }
 
-.ocr-progress i {
+.weekly-change.is-up {
+  background: rgba(70, 215, 163, 0.13);
+  color: var(--green);
+}
+
+.weekly-change.is-down {
+  background: rgba(255, 178, 92, 0.13);
+  color: #ffbd73;
+}
+
+.weekly-report-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.weekly-report-grid > div {
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--soft);
+}
+
+.weekly-report-grid span,
+.weekly-coach > span {
   display: block;
-  width: 0;
-  height: 100%;
-  border-radius: inherit;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.weekly-report-grid b {
+  display: block;
+  margin-top: 6px;
+  font-size: 18px;
+}
+
+.weekly-coach {
+  margin-top: 12px;
+  padding: 15px;
+  border-radius: 16px;
   background: linear-gradient(
-    90deg,
-    var(--green),
-    var(--blue)
+    135deg,
+    rgba(70, 215, 163, 0.10),
+    rgba(70, 168, 255, 0.10)
   );
-  transition: width 0.2s ease;
+}
+
+.weekly-coach p {
+  margin: 7px 0 0;
+  color: #e8f0fb;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+@media (max-width: 350px) {
+  .weekly-report-header {
+    align-items: flex-start !important;
+    flex-direction: column;
+  }
+
+  .weekly-report-grid {
+    grid-template-columns: 1fr;
+  }
 }
