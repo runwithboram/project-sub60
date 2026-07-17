@@ -1,10 +1,11 @@
 /*
- * Road to SUB60 Dashboard v2.2
+ * Road to SUB60 Dashboard v2.3
  * - 최신 러닝 효율 원형 게이지
  * - 최근 기록 비교
  * - Sub60 진행률
  * - Coach Analysis
  * - 운동 기록 입력 아코디언
+ * - 최근 효율 추세 차트와 평균·최고점
  */
 (() => {
   let pendingHeartRate = null;
@@ -259,6 +260,8 @@
         <small>${progress.message}</small>
       </div>
 
+      ${buildTrendPanel(validLogs)}
+
       <div class="coach-panel">
         <div class="coach-symbol">AI</div>
         <div>
@@ -492,6 +495,129 @@
       label: "기준 기록",
       className: "is-neutral"
     };
+  }
+
+  function buildTrendPanel(validLogs) {
+    const recent = validLogs.slice(0, 7).reverse();
+
+    if (recent.length < 2) {
+      return `
+        <div class="trend-panel is-locked">
+          <div class="trend-panel-head">
+            <div>
+              <span>RECENT TREND</span>
+              <b>효율 추세</b>
+            </div>
+            <small>1회 더 필요</small>
+          </div>
+          <p>
+            평균 심박이 포함된 러닝을 한 번 더 저장하면
+            최근 효율 변화가 그래프로 나타납니다.
+          </p>
+        </div>
+      `;
+    }
+
+    const scores = recent.map(log => Number(log.efficiencyScore));
+    const average = Math.round(
+      scores.reduce((sum, score) => sum + score, 0) / scores.length
+    );
+    const best = Math.max(...scores);
+    const first = scores[0];
+    const last = scores[scores.length - 1];
+    const change = last - first;
+    const trendClass = change > 0 ? "is-up" : change < 0 ? "is-down" : "is-neutral";
+    const trendText = change > 0
+      ? `+${change}점`
+      : change < 0
+        ? `${change}점`
+        : "변화 없음";
+    const chart = buildTrendSvg(scores);
+
+    return `
+      <div class="trend-panel">
+        <div class="trend-panel-head">
+          <div>
+            <span>RECENT TREND</span>
+            <b>최근 ${recent.length}회 효율</b>
+          </div>
+          <small class="${trendClass}">${trendText}</small>
+        </div>
+
+        <div class="trend-chart" aria-label="최근 러닝 효율 추세">
+          ${chart}
+        </div>
+
+        <div class="trend-stats">
+          <div>
+            <span>최근 평균</span>
+            <b>${average}</b>
+          </div>
+          <div>
+            <span>최고 효율</span>
+            <b>${best}</b>
+          </div>
+          <div>
+            <span>최근 점수</span>
+            <b>${last}</b>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function buildTrendSvg(scores) {
+    const width = 300;
+    const height = 96;
+    const paddingX = 10;
+    const paddingY = 12;
+    const minScore = Math.min(...scores);
+    const maxScore = Math.max(...scores);
+    const range = Math.max(8, maxScore - minScore);
+    const chartMin = minScore - Math.max(2, (8 - (maxScore - minScore)) / 2);
+    const chartMax = chartMin + range;
+    const step = scores.length > 1
+      ? (width - paddingX * 2) / (scores.length - 1)
+      : 0;
+
+    const points = scores.map((score, index) => {
+      const x = paddingX + step * index;
+      const ratio = (score - chartMin) / (chartMax - chartMin);
+      const y = height - paddingY - ratio * (height - paddingY * 2);
+      return { x, y, score };
+    });
+
+    const line = points
+      .map(point => `${point.x.toFixed(1)},${point.y.toFixed(1)}`)
+      .join(" ");
+    const area = [
+      `${points[0].x.toFixed(1)},${height - paddingY}`,
+      line,
+      `${points[points.length - 1].x.toFixed(1)},${height - paddingY}`
+    ].join(" ");
+    const dots = points.map((point, index) => `
+      <circle
+        cx="${point.x.toFixed(1)}"
+        cy="${point.y.toFixed(1)}"
+        r="${index === points.length - 1 ? 4.5 : 3}"
+        class="${index === points.length - 1 ? "is-latest" : ""}"
+      ></circle>
+    `).join("");
+
+    return `
+      <svg viewBox="0 0 ${width} ${height}" role="img">
+        <defs>
+          <linearGradient id="efficiencyTrendFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="currentColor" stop-opacity=".24"></stop>
+            <stop offset="100%" stop-color="currentColor" stop-opacity="0"></stop>
+          </linearGradient>
+        </defs>
+        <line x1="10" y1="84" x2="290" y2="84" class="trend-baseline"></line>
+        <polygon points="${area}" fill="url(#efficiencyTrendFill)"></polygon>
+        <polyline points="${line}" class="trend-line"></polyline>
+        <g class="trend-dots">${dots}</g>
+      </svg>
+    `;
   }
 
   function buildCoachMessage(latest, comparison) {
