@@ -1,5 +1,5 @@
 /*
- * Road to SUB60 Dashboard v2.1
+ * Road to SUB60 Dashboard v2.2
  * - 최신 러닝 효율 원형 게이지
  * - 최근 기록 비교
  * - Sub60 진행률
@@ -14,7 +14,8 @@
   const originalSaveWorkout = window.saveWorkout;
   const originalApplyExtractedData = window.applyExtractedData;
 
-  window.renderApp = function renderAppV21() {
+  window.renderApp = function renderAppV22() {
+    backfillEfficiencyScores();
     originalRenderApp();
     enhanceHero();
     injectHeartRateInput();
@@ -23,7 +24,7 @@
     setupRecordAccordion();
   };
 
-  window.applyExtractedData = function applyExtractedDataV21(extracted) {
+  window.applyExtractedData = function applyExtractedDataV22(extracted) {
     originalApplyExtractedData(extracted);
 
     const input = document.getElementById("avgHeartRate");
@@ -34,7 +35,7 @@
     }
   };
 
-  window.saveWorkout = function saveWorkoutV21() {
+  window.saveWorkout = function saveWorkoutV22() {
     pendingHeartRate = validHeartRate(
       document.getElementById("avgHeartRate")?.value
     );
@@ -61,6 +62,23 @@
     renderApp();
     bind();
   };
+
+  function backfillEfficiencyScores() {
+    let changed = false;
+
+    appData.logs.forEach(log => {
+      if (!hasEfficiencyData(log)) return;
+
+      const score = calculateEfficiencyScore(log);
+
+      if (score !== null && Number(log.efficiencyScore) !== score) {
+        log.efficiencyScore = score;
+        changed = true;
+      }
+    });
+
+    if (changed) save();
+  }
 
   function enhanceHero() {
     const heroRow = document.querySelector(".heroRow");
