@@ -26,28 +26,46 @@
     const app = document.getElementById("app");
     if (!app || document.getElementById("bbTabbar")) return;
 
-    const currentMarkup = app.innerHTML;
+    /*
+     * 기존 러닝 화면을 문자열로 복사하면 버튼 이벤트가 사라집니다.
+     * 실제 DOM 노드를 DocumentFragment로 옮겨 이벤트를 그대로 보존합니다.
+     */
+    const runningNodes = document.createDocumentFragment();
 
-    app.innerHTML = `
-      <nav id="bbTabbar" class="bb-tabbar" aria-label="주요 메뉴">
-        <button class="bb-tab is-active" type="button" data-bb-tab="running">
-          러닝
-        </button>
-        <button class="bb-tab" type="button" data-bb-tab="balance">
-          바디 밸런스
-        </button>
-      </nav>
+    while (app.firstChild) {
+      runningNodes.appendChild(app.firstChild);
+    }
 
-      <div id="bbRunningPanel" class="bb-panel">
-        ${currentMarkup}
-      </div>
-
-      <div id="bbBalancePanel" class="bb-panel" hidden>
-        ${renderBalancePanel()}
-      </div>
-
-      <div id="bbToast" class="bb-toast" role="status"></div>
+    const tabbar = document.createElement("nav");
+    tabbar.id = "bbTabbar";
+    tabbar.className = "bb-tabbar";
+    tabbar.setAttribute("aria-label", "주요 메뉴");
+    tabbar.innerHTML = `
+      <button class="bb-tab is-active" type="button" data-bb-tab="running">
+        러닝
+      </button>
+      <button class="bb-tab" type="button" data-bb-tab="balance">
+        바디 밸런스
+      </button>
     `;
+
+    const runningPanel = document.createElement("div");
+    runningPanel.id = "bbRunningPanel";
+    runningPanel.className = "bb-panel";
+    runningPanel.appendChild(runningNodes);
+
+    const balancePanel = document.createElement("div");
+    balancePanel.id = "bbBalancePanel";
+    balancePanel.className = "bb-panel";
+    balancePanel.hidden = true;
+    balancePanel.innerHTML = renderBalancePanel();
+
+    const toastElement = document.createElement("div");
+    toastElement.id = "bbToast";
+    toastElement.className = "bb-toast";
+    toastElement.setAttribute("role", "status");
+
+    app.append(tabbar, runningPanel, balancePanel, toastElement);
 
     refreshBalanceView();
   }
@@ -998,51 +1016,4 @@
   }
 })();
 
-
-/* =========================================================
-   running event bridge
-   화면이 다시 그려져도 러닝 저장 버튼과 입력 미리보기가 작동합니다.
-   ========================================================= */
-(() => {
-  "use strict";
-
-  if (window.__sub60RunningEventBridgeInstalled) return;
-  window.__sub60RunningEventBridgeInstalled = true;
-
-  document.addEventListener(
-    "click",
-    event => {
-      const saveButton = event.target.closest?.("#saveRun");
-      if (!saveButton) return;
-
-      event.preventDefault();
-      event.stopPropagation();
-      event.stopImmediatePropagation();
-
-      if (typeof saveWorkout === "function") {
-        saveWorkout();
-        return;
-      }
-
-      alert("러닝 저장 기능을 불러오지 못했습니다. 페이지를 다시 열어 주세요.");
-    },
-    true
-  );
-
-  document.addEventListener(
-    "input",
-    event => {
-      if (!event.target.matches?.("#distance, #time")) return;
-
-      if (event.target.id === "time") {
-        event.target.value = event.target.value.replace(/\D/g, "").slice(0, 6);
-      }
-
-      if (typeof preview === "function") {
-        preview();
-      }
-    },
-    true
-  );
-})();
 
