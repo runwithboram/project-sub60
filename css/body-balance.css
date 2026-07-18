@@ -682,3 +682,132 @@
 #bbBalancePanel .bb-capture-preview .bb-form-actions {
   margin-top: 12px !important;
 }
+
+
+/* =========================================================
+   v5 Running × Body integrated status
+   ========================================================= */
+#bbBalancePanel .bb-integrated-card {
+  background:
+    linear-gradient(145deg, #f7fbf9 0%, #eef6f2 100%) !important;
+}
+
+#bbBalancePanel .bb-status-kicker {
+  display: inline-block !important;
+  margin-bottom: 5px !important;
+  color: #315d4f !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: .11em !important;
+}
+
+#bbBalancePanel .bb-integrated-status {
+  margin-top: 4px !important;
+  padding: 18px !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  border: 1px solid rgba(49, 93, 79, .14) !important;
+}
+
+#bbBalancePanel .bb-status-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 28px !important;
+  padding: 0 10px !important;
+  border-radius: 999px !important;
+  background: #e8f3ee !important;
+  color: #315d4f !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: .06em !important;
+}
+
+#bbBalancePanel .bb-integrated-status h3 {
+  margin: 12px 0 7px !important;
+  color: #213a32 !important;
+  font-size: 21px !important;
+  line-height: 1.35 !important;
+  font-weight: 900 !important;
+}
+
+#bbBalancePanel .bb-integrated-status > p {
+  margin: 0 !important;
+  color: #53615c !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+}
+
+#bbBalancePanel .bb-status-evidence {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  margin-top: 15px !important;
+}
+
+#bbBalancePanel .bb-status-evidence > div {
+  min-width: 0 !important;
+  padding: 11px 10px !important;
+  border-radius: 13px !important;
+  background: #f4f7f5 !important;
+}
+
+#bbBalancePanel .bb-status-evidence span {
+  display: block !important;
+  margin-bottom: 5px !important;
+  color: #6c7873 !important;
+  font-size: 11px !important;
+  font-weight: 750 !important;
+}
+
+#bbBalancePanel .bb-status-evidence b {
+  display: block !important;
+  color: #33433d !important;
+  font-size: 14px !important;
+  line-height: 1.3 !important;
+  font-weight: 900 !important;
+  background: transparent !important;
+}
+
+#bbBalancePanel .bb-status-evidence .is-good {
+  background: #eaf5ef !important;
+}
+
+#bbBalancePanel .bb-status-evidence .is-good b {
+  color: #236047 !important;
+}
+
+#bbBalancePanel .bb-status-evidence .is-bad {
+  background: #fff0ea !important;
+}
+
+#bbBalancePanel .bb-status-evidence .is-bad b {
+  color: #a34d28 !important;
+}
+
+#bbBalancePanel .bb-status-note {
+  display: block !important;
+  margin-top: 13px !important;
+  color: #75807c !important;
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+}
+
+#bbBalancePanel .bb-integrated-status.is-best {
+  border-color: rgba(35, 96, 71, .28) !important;
+  box-shadow: 0 10px 25px rgba(35, 96, 71, .08) !important;
+}
+
+#bbBalancePanel .bb-integrated-status.is-warning .bb-status-badge {
+  background: #fff0ea !important;
+  color: #a34d28 !important;
+}
+
+#bbBalancePanel .bb-integrated-status.is-warning h3 {
+  color: #7a3d24 !important;
+}
+
+@media (max-width: 520px) {
+  #bbBalancePanel .bb-status-evidence {
+    grid-template-columns: 1fr !important;
+  }
+}
