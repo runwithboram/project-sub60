@@ -24,6 +24,7 @@
     injectEfficiencyDashboard();
     arrangeDashboard();
     setupRecordAccordion();
+    injectSettingsMenu();
   };
 
   window.applyExtractedData = function applyExtractedDataV22(extracted) {
@@ -862,6 +863,90 @@
       `${minutes}분 ` +
       `${String(secondsPart).padStart(2, "0")}초`
     );
+  }
+
+  function injectSettingsMenu() {
+    document.getElementById("settingsButton")?.remove();
+    document.getElementById("settingsModal")?.remove();
+
+    const button = document.createElement("button");
+    button.id = "settingsButton";
+    button.className = "settings-fab";
+    button.type = "button";
+    button.setAttribute("aria-label", "설정 열기");
+    button.textContent = "⚙";
+
+    const modal = document.createElement("div");
+    modal.id = "settingsModal";
+    modal.className = "settings-modal";
+    modal.setAttribute("aria-hidden", "true");
+    modal.innerHTML = `
+      <div class="settings-backdrop" data-close-settings></div>
+      <section class="settings-sheet" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+        <div class="settings-sheet-head">
+          <div>
+            <span>SETTINGS</span>
+            <h2 id="settingsTitle">설정</h2>
+          </div>
+          <button type="button" class="settings-close" data-close-settings aria-label="설정 닫기">×</button>
+        </div>
+
+        <div class="settings-item">
+          <div>
+            <b>운동 기록 초기화</b>
+            <p>테스트로 저장한 러닝 기록과 효율 데이터를 모두 삭제합니다.</p>
+          </div>
+          <button id="resetWorkoutData" type="button" class="danger-button">기록 삭제</button>
+        </div>
+
+        <small class="settings-note">이름, 목표, PB, 대회 일정은 유지됩니다.</small>
+      </section>
+    `;
+
+    document.body.append(button, modal);
+
+    const open = () => {
+      modal.classList.add("is-open");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.classList.add("settings-open");
+    };
+
+    const close = () => {
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("settings-open");
+    };
+
+    button.addEventListener("click", open);
+    modal.querySelectorAll("[data-close-settings]").forEach(el => {
+      el.addEventListener("click", close);
+    });
+
+    modal.querySelector("#resetWorkoutData")?.addEventListener("click", () => {
+      const count = Array.isArray(appData.logs) ? appData.logs.length : 0;
+      const confirmed = window.confirm(
+        count > 0
+          ? `저장된 운동 기록 ${count}개를 모두 삭제할까요?\n이 작업은 되돌릴 수 없습니다.`
+          : "저장된 운동 기록이 없습니다. 초기 상태로 정리할까요?"
+      );
+
+      if (!confirmed) return;
+
+      appData.logs = [];
+      appData.weekly.current = 0;
+      save();
+      close();
+      recordPanelOpen = false;
+      renderApp();
+      bind();
+      alert("운동 기록을 모두 삭제했습니다.");
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && modal.classList.contains("is-open")) {
+        close();
+      }
+    }, { once: true });
   }
 
   function validHeartRate(value) {
