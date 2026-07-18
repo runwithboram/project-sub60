@@ -832,3 +832,175 @@
   color: #315d4f !important;
   opacity: 1 !important;
 }
+
+
+/* =========================================================
+   v6 connection analysis + input shortcut
+   ========================================================= */
+#bbBalancePanel .bb-connection-card .bb-card-header h2,
+#bbBalancePanel .bb-connection-card .bb-card-header p {
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+#bbBalancePanel .bb-connection-card .bb-card-header h2 {
+  color: #213a32 !important;
+}
+
+#bbBalancePanel .bb-connection-card .bb-card-header p {
+  color: #53615c !important;
+}
+
+#bbBalancePanel .bb-connection-analysis,
+#bbBalancePanel .bb-connection-empty {
+  padding: 17px !important;
+  border-radius: 18px !important;
+  background: #f7faf8 !important;
+  border: 1px solid rgba(49, 93, 79, .13) !important;
+}
+
+#bbBalancePanel .bb-connection-metrics {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+#bbBalancePanel .bb-connection-metrics > div {
+  padding: 11px 10px !important;
+  border-radius: 13px !important;
+  background: #fff !important;
+}
+
+#bbBalancePanel .bb-connection-metrics span {
+  display: block !important;
+  margin-bottom: 5px !important;
+  color: #71807a !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+}
+
+#bbBalancePanel .bb-connection-metrics b {
+  display: block !important;
+  color: #29483d !important;
+  font-size: 14px !important;
+  line-height: 1.3 !important;
+  background: transparent !important;
+}
+
+#bbBalancePanel .bb-connection-copy {
+  margin-top: 15px !important;
+}
+
+#bbBalancePanel .bb-connection-copy > span {
+  display: inline-block !important;
+  margin-bottom: 6px !important;
+  color: #4b6c60 !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+}
+
+#bbBalancePanel .bb-connection-copy h3 {
+  margin: 0 0 7px !important;
+  color: #213a32 !important;
+  font-size: 18px !important;
+  line-height: 1.4 !important;
+  font-weight: 900 !important;
+}
+
+#bbBalancePanel .bb-connection-copy p,
+#bbBalancePanel .bb-connection-empty p {
+  margin: 0 !important;
+  color: #596761 !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+}
+
+#bbBalancePanel .bb-connection-analysis > small {
+  display: block !important;
+  margin-top: 12px !important;
+  color: #7b8782 !important;
+  font-size: 11px !important;
+  line-height: 1.5 !important;
+}
+
+#bbBalancePanel .bb-connection-empty b {
+  display: block !important;
+  margin-bottom: 7px !important;
+  color: #29483d !important;
+  font-size: 16px !important;
+  background: transparent !important;
+}
+
+#bbBalancePanel .bb-connection-counts {
+  display: flex !important;
+  gap: 8px !important;
+  margin-top: 12px !important;
+}
+
+#bbBalancePanel .bb-connection-counts span {
+  padding: 7px 10px !important;
+  border-radius: 999px !important;
+  background: #eaf2ee !important;
+  color: #466358 !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+
+#bbBalancePanel .bb-input-shortcut {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin: 0 0 16px !important;
+  padding: 14px 16px !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: #315d4f !important;
+  box-shadow: 0 8px 20px rgba(49, 93, 79, .16) !important;
+  cursor: pointer !important;
+}
+
+#bbBalancePanel .bb-input-shortcut span {
+  color: #fff !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+}
+
+#bbBalancePanel .bb-input-shortcut small {
+  color: rgba(255,255,255,.78) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+}
+
+#bbBalancePanel .bb-input-section {
+  scroll-margin-top: 18px !important;
+  transition:
+    box-shadow .28s ease,
+    transform .28s ease,
+    background .28s ease !important;
+}
+
+#bbBalancePanel .bb-input-section.is-highlighted {
+  background: #f1f8f4 !important;
+  box-shadow: 0 0 0 3px rgba(49, 93, 79, .22),
+              0 14px 30px rgba(49, 93, 79, .13) !important;
+  transform: translateY(-2px) !important;
+}
+
+#bbBalancePanel .bb-manual-inline {
+  margin-top: 18px !important;
+  padding-top: 18px !important;
+  border-top: 1px solid rgba(49, 93, 79, .14) !important;
+}
+
+@media (max-width: 520px) {
+  #bbBalancePanel .bb-connection-metrics {
+    grid-template-columns: 1fr !important;
+  }
+
+  #bbBalancePanel .bb-input-shortcut {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+  }
+}
