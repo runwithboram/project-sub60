@@ -1,11 +1,12 @@
 /*
- * Road to SUB60 Dashboard v2.3
+ * Road to SUB60 Dashboard v2.4
  * - 최신 러닝 효율 원형 게이지
  * - 최근 기록 비교
  * - Sub60 진행률
  * - Coach Analysis
  * - 운동 기록 입력 아코디언
  * - 최근 효율 추세 차트와 평균·최고점
+ * - AI Coach: 컨디션, 레이스 준비도, 다음 러닝 추천
  */
 (() => {
   let pendingHeartRate = null;
@@ -262,13 +263,7 @@
 
       ${buildTrendPanel(validLogs)}
 
-      <div class="coach-panel">
-        <div class="coach-symbol">AI</div>
-        <div>
-          <span>COACH ANALYSIS</span>
-          <p>${buildCoachMessage(latest, comparison)}</p>
-        </div>
-      </div>
+      ${buildCoachPanel(latest, comparison, validLogs, prediction)}
 
       <button
         id="openRecordFromDashboard"
@@ -618,6 +613,142 @@
         <g class="trend-dots">${dots}</g>
       </svg>
     `;
+  }
+
+  function buildCoachPanel(latest, comparison, validLogs, prediction) {
+    const coach = getCoachAnalysis(
+      latest,
+      comparison,
+      validLogs,
+      prediction
+    );
+
+    return `
+      <section class="ai-coach-card ${coach.className}">
+        <div class="ai-coach-head">
+          <div class="ai-coach-title">
+            <div class="coach-symbol">AI</div>
+            <div>
+              <span>AI COACH</span>
+              <h3>${coach.condition}</h3>
+            </div>
+          </div>
+
+          <div class="readiness-score" aria-label="레이스 준비도 ${coach.readiness}퍼센트">
+            <strong>${coach.readiness}</strong>
+            <span>READINESS</span>
+          </div>
+        </div>
+
+        <p class="coach-summary">${coach.message}</p>
+
+        <div class="coach-signals">
+          ${coach.signals.map(signal => `
+            <span class="${signal.className}">${signal.text}</span>
+          `).join("")}
+        </div>
+
+        <div class="next-run-card">
+          <div>
+            <span>NEXT RUN</span>
+            <b>${coach.nextRun.title}</b>
+          </div>
+          <strong>${coach.nextRun.distance}</strong>
+          <p>${coach.nextRun.detail}</p>
+        </div>
+
+        <small class="coach-note">
+          최근 저장 기록을 바탕으로 한 자동 코칭입니다. 컨디션이 좋지 않으면 회복을 우선하세요.
+        </small>
+      </section>
+    `;
+  }
+
+  function getCoachAnalysis(latest, comparison, validLogs, prediction) {
+    const recent = validLogs.slice(0, 5);
+    const scores = recent.map(log => Number(log.efficiencyScore));
+    const average = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+    const latestScore = Number(latest.efficiencyScore);
+    const trendDelta = comparison.delta ?? 0;
+    const targetGap = Math.max(0, prediction.seconds - 3600);
+
+    let readiness = Math.round(
+      45 +
+      Math.max(0, Math.min(30, (latestScore - 70) * 1.5)) +
+      Math.max(-8, Math.min(8, trendDelta * 1.4)) +
+      Math.max(0, Math.min(12, recent.length * 2.4))
+    );
+
+    if (targetGap <= 0) readiness += 8;
+    else if (targetGap <= 180) readiness += 5;
+    else if (targetGap >= 600) readiness -= 5;
+
+    readiness = Math.max(20, Math.min(96, readiness));
+
+    let condition = "안정적인 흐름";
+    let className = "is-steady";
+    let message = buildCoachMessage(latest, comparison);
+    let nextRun = {
+      title: "이지런",
+      distance: "5–6 km",
+      detail: "대화가 가능한 강도로 편안하게 달리며 회복과 주간 볼륨을 확보하세요."
+    };
+
+    if (trendDelta >= 3 && latestScore >= average) {
+      condition = "컨디션 좋음";
+      className = "is-ready";
+      nextRun = {
+        title: "템포런",
+        distance: "5–7 km",
+        detail: "워밍업 후 15–20분을 6:05–6:20/km 범위로 유지해 Sub60 페이스 적응을 높이세요."
+      };
+    } else if (trendDelta <= -3) {
+      condition = "회복 우선";
+      className = "is-recovery";
+      nextRun = {
+        title: "회복런 또는 휴식",
+        distance: "3–5 km",
+        detail: "심박을 낮게 유지하고 다리가 무겁다면 러닝 대신 걷기·스트레칭으로 바꾸세요."
+      };
+    } else if (targetGap > 300 && latestScore >= 82) {
+      condition = "속도 자극 필요";
+      className = "is-build";
+      nextRun = {
+        title: "짧은 인터벌",
+        distance: "총 6 km",
+        detail: "400m 빠르게·400m 천천히를 5회 반복하고, 빠른 구간은 무리하지 않는 5K 노력도로 진행하세요."
+      };
+    }
+
+    const signals = [
+      {
+        text: trendDelta > 0
+          ? `효율 +${trendDelta.toFixed(1)}`
+          : trendDelta < 0
+            ? `효율 ${trendDelta.toFixed(1)}`
+            : "효율 유지",
+        className: trendDelta > 0 ? "is-positive" : trendDelta < 0 ? "is-caution" : ""
+      },
+      {
+        text: `평균 심박 ${latest.avgHeartRate} bpm`,
+        className: ""
+      },
+      {
+        text: prediction.seconds <= 3600
+          ? "Sub60 페이스권"
+          : `목표까지 ${formatGap(prediction.seconds - 3600)}`,
+        className: prediction.seconds <= 3600 ? "is-positive" : ""
+      }
+    ];
+
+    return {
+      readiness,
+      condition,
+      className,
+      message,
+      nextRun,
+      signals
+    };
   }
 
   function buildCoachMessage(latest, comparison) {
