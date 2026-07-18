@@ -997,3 +997,52 @@
     };
   }
 })();
+
+
+/* =========================================================
+   running event bridge
+   화면이 다시 그려져도 러닝 저장 버튼과 입력 미리보기가 작동합니다.
+   ========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__sub60RunningEventBridgeInstalled) return;
+  window.__sub60RunningEventBridgeInstalled = true;
+
+  document.addEventListener(
+    "click",
+    event => {
+      const saveButton = event.target.closest?.("#saveRun");
+      if (!saveButton) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+      if (typeof saveWorkout === "function") {
+        saveWorkout();
+        return;
+      }
+
+      alert("러닝 저장 기능을 불러오지 못했습니다. 페이지를 다시 열어 주세요.");
+    },
+    true
+  );
+
+  document.addEventListener(
+    "input",
+    event => {
+      if (!event.target.matches?.("#distance, #time")) return;
+
+      if (event.target.id === "time") {
+        event.target.value = event.target.value.replace(/\D/g, "").slice(0, 6);
+      }
+
+      if (typeof preview === "function") {
+        preview();
+      }
+    },
+    true
+  );
+})();
+
