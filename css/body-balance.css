@@ -573,3 +573,70 @@
     grid-template-columns: 1fr !important;
   }
 }
+
+
+/* =========================================================
+   v3 readability fix
+   요약 카드와 판정 문구의 텍스트 대비를 강제로 보정합니다.
+   ========================================================= */
+
+#bbBalancePanel .bb-metric,
+#bbBalancePanel .bb-metric * {
+  color: inherit;
+}
+
+#bbBalancePanel .bb-metric {
+  background: #f5f7f6 !important;
+}
+
+#bbBalancePanel .bb-metric span {
+  color: #53615c !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+}
+
+#bbBalancePanel .bb-metric b {
+  color: #26332f !important;
+  font-size: 22px !important;
+  line-height: 1.15 !important;
+  font-weight: 900 !important;
+  background: transparent !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+
+#bbBalancePanel .bb-metric small {
+  color: #64716c !important;
+  font-size: 13px !important;
+  line-height: 1.35 !important;
+  opacity: 1 !important;
+}
+
+#bbBalancePanel .bb-verdict {
+  color: #2f423b !important;
+  background: #eaf3ef !important;
+  border-left-color: #315d4f !important;
+  opacity: 1 !important;
+}
+
+#bbBalancePanel .bb-verdict b {
+  color: #23453a !important;
+  background: transparent !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+
+#bbBalancePanel .bb-verdict.warn {
+  color: #67452f !important;
+  background: #fff4ec !important;
+  border-left-color: #d77a4a !important;
+}
+
+#bbBalancePanel .bb-verdict.warn b {
+  color: #8b4b27 !important;
+}
+
+#bbBalancePanel .bb-summary-grid {
+  gap: 12px !important;
+}
