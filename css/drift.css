@@ -596,7 +596,177 @@
     text-align: center;
   }
 }
-\n\n/* AI Coach v2.4 */\n.ai-coach-card {\n  position: relative;\n  z-index: 1;\n  margin-top: 12px;\n  padding: 17px;\n  overflow: hidden;\n  border: 1px solid rgba(70, 168, 255, .14);\n  border-radius: 20px;\n  background:\n    linear-gradient(145deg, rgba(70, 168, 255, .09), rgba(255, 255, 255, .035));\n}\n\n.ai-coach-card::after {\n  position: absolute;\n  top: -58px;\n  right: -48px;\n  width: 130px;\n  height: 130px;\n  border-radius: 50%;\n  background: rgba(70, 168, 255, .10);\n  content: "";\n  filter: blur(2px);\n  pointer-events: none;\n}\n\n.ai-coach-card.is-ready {\n  border-color: rgba(70, 215, 163, .2);\n  background: linear-gradient(145deg, rgba(70, 215, 163, .10), rgba(70, 168, 255, .045));\n}\n\n.ai-coach-card.is-recovery {\n  border-color: rgba(255, 178, 92, .22);\n  background: linear-gradient(145deg, rgba(255, 178, 92, .09), rgba(255, 255, 255, .035));\n}\n\n.ai-coach-head,\n.ai-coach-title {\n  position: relative;\n  z-index: 1;\n  display: flex;\n  align-items: center;\n}\n\n.ai-coach-head {\n  justify-content: space-between;\n  gap: 14px;\n}\n\n.ai-coach-title {\n  gap: 11px;\n}\n\n.ai-coach-title span,\n.next-run-card span {\n  display: block;\n  color: var(--muted);\n  font-size: 10px;\n  font-weight: 900;\n  letter-spacing: .1em;\n}\n\n.ai-coach-title h3 {\n  margin: 4px 0 0;\n  font-size: 19px;\n}\n\n.readiness-score {\n  flex: none;\n  display: grid;\n  width: 62px;\n  height: 62px;\n  place-items: center;\n  align-content: center;\n  border-radius: 50%;\n  background: rgba(255, 255, 255, .07);\n  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);\n}\n\n.readiness-score strong {\n  font-size: 23px;\n  line-height: 1;\n}\n\n.readiness-score span {\n  margin-top: 4px;\n  color: var(--muted);\n  font-size: 7px;\n  font-weight: 900;\n  letter-spacing: .06em;\n}\n\n.coach-summary {\n  position: relative;\n  z-index: 1;\n  margin: 15px 0 12px;\n  color: #eaf2fc;\n  font-size: 14px;\n  line-height: 1.62;\n}\n\n.coach-signals {\n  position: relative;\n  z-index: 1;\n  display: flex;\n  flex-wrap: wrap;\n  gap: 7px;\n}\n\n.coach-signals span {\n  padding: 7px 9px;\n  border-radius: 999px;\n  background: rgba(255, 255, 255, .065);\n  color: #cfd9e8;\n  font-size: 11px;\n  font-weight: 750;\n}\n\n.coach-signals span.is-positive {\n  background: rgba(70, 215, 163, .12);\n  color: var(--green);\n}\n\n.coach-signals span.is-caution {\n  background: rgba(255, 178, 92, .12);\n  color: #ffbd73;\n}\n\n.next-run-card {\n  position: relative;\n  z-index: 1;\n  display: grid;\n  grid-template-columns: 1fr auto;\n  gap: 5px 12px;\n  margin-top: 13px;\n  padding: 14px;\n  border-radius: 16px;\n  background: rgba(8, 18, 33, .34);\n}\n\n.next-run-card b {\n  display: block;\n  margin-top: 4px;\n  font-size: 16px;\n}\n\n.next-run-card > strong {\n  align-self: center;\n  font-size: 16px;\n}\n\n.next-run-card p {\n  grid-column: 1 / -1;\n  margin: 4px 0 0;\n  color: var(--muted);\n  font-size: 12px;\n  line-height: 1.55;\n}\n\n.coach-note {\n  position: relative;\n  z-index: 1;\n  display: block;\n  margin-top: 10px;\n  color: var(--muted);\n  font-size: 10px;\n  line-height: 1.45;\n}\n
+
+
+/* AI Coach v2.4 */
+.ai-coach-card {
+  position: relative;
+  z-index: 1;
+  margin-top: 12px;
+  padding: 17px;
+  overflow: hidden;
+  border: 1px solid rgba(70, 168, 255, .14);
+  border-radius: 20px;
+  background:
+    linear-gradient(145deg, rgba(70, 168, 255, .09), rgba(255, 255, 255, .035));
+}
+
+.ai-coach-card::after {
+  position: absolute;
+  top: -58px;
+  right: -48px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: rgba(70, 168, 255, .10);
+  content: "";
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+.ai-coach-card.is-ready {
+  border-color: rgba(70, 215, 163, .2);
+  background: linear-gradient(145deg, rgba(70, 215, 163, .10), rgba(70, 168, 255, .045));
+}
+
+.ai-coach-card.is-recovery {
+  border-color: rgba(255, 178, 92, .22);
+  background: linear-gradient(145deg, rgba(255, 178, 92, .09), rgba(255, 255, 255, .035));
+}
+
+.ai-coach-head,
+.ai-coach-title {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+}
+
+.ai-coach-head {
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.ai-coach-title {
+  gap: 11px;
+}
+
+.ai-coach-title span,
+.next-run-card span {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .1em;
+}
+
+.ai-coach-title h3 {
+  margin: 4px 0 0;
+  font-size: 19px;
+}
+
+.readiness-score {
+  flex: none;
+  display: grid;
+  width: 62px;
+  height: 62px;
+  place-items: center;
+  align-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .07);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
+}
+
+.readiness-score strong {
+  font-size: 23px;
+  line-height: 1;
+}
+
+.readiness-score span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .06em;
+}
+
+.coach-summary {
+  position: relative;
+  z-index: 1;
+  margin: 15px 0 12px;
+  color: #eaf2fc;
+  font-size: 14px;
+  line-height: 1.62;
+}
+
+.coach-signals {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.coach-signals span {
+  padding: 7px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .065);
+  color: #cfd9e8;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.coach-signals span.is-positive {
+  background: rgba(70, 215, 163, .12);
+  color: var(--green);
+}
+
+.coach-signals span.is-caution {
+  background: rgba(255, 178, 92, .12);
+  color: #ffbd73;
+}
+
+.next-run-card {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 5px 12px;
+  margin-top: 13px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(8, 18, 33, .34);
+}
+
+.next-run-card b {
+  display: block;
+  margin-top: 4px;
+  font-size: 16px;
+}
+
+.next-run-card > strong {
+  align-self: center;
+  font-size: 16px;
+}
+
+.next-run-card p {
+  grid-column: 1 / -1;
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.coach-note {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
 
 /* Settings */
 .settings-fab {
