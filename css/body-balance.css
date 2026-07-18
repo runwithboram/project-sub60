@@ -640,3 +640,45 @@
 #bbBalancePanel .bb-summary-grid {
   gap: 12px !important;
 }
+
+
+/* =========================================================
+   v4 InBody capture OCR
+   ========================================================= */
+#bbBalancePanel .bb-file-button-sub {
+  background: #eef2f0 !important;
+  color: #52615c !important;
+}
+
+#bbBalancePanel .bb-capture-preview {
+  margin-top: 14px !important;
+  padding: 12px !important;
+  border: 1px solid var(--bb-line) !important;
+  border-radius: 16px !important;
+  background: #f8faf9 !important;
+}
+
+#bbBalancePanel .bb-capture-preview[hidden] {
+  display: none !important;
+}
+
+#bbBalancePanel .bb-capture-preview img {
+  display: block !important;
+  width: 100% !important;
+  max-height: 360px !important;
+  object-fit: contain !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+}
+
+#bbBalancePanel .bb-capture-status {
+  margin: 10px 0 0 !important;
+  color: #52615c !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  font-weight: 700 !important;
+}
+
+#bbBalancePanel .bb-capture-preview .bb-form-actions {
+  margin-top: 12px !important;
+}
