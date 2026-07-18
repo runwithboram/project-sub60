@@ -83,11 +83,72 @@
         </p>
       </section>
 
+      <section class="bb-card bb-integrated-card">
+        <div class="bb-card-header">
+          <div>
+            <span class="bb-status-kicker">RUN × BODY</span>
+            <h2>Sub60 통합 판정</h2>
+            <p>최근 인바디와 러닝 기록을 함께 봅니다.</p>
+          </div>
+        </div>
+        <div id="bbIntegratedStatus"></div>
+      </section>
+
+      <section class="bb-card bb-connection-card">
+        <div class="bb-card-header">
+          <div>
+            <span class="bb-status-kicker">CONNECTION</span>
+            <h2>러닝 × 체성분 연결 분석</h2>
+            <p>두 데이터가 같은 방향으로 움직이는지 확인합니다.</p>
+          </div>
+        </div>
+        <div id="bbConnectionAnalysis"></div>
+      </section>
+
+      <button id="bbGoToInput" class="bb-input-shortcut" type="button">
+        <span>＋ 인바디 기록 추가</span>
+        <small>캡처 · 직접 입력 · CSV</small>
+      </button>
+
       <section class="bb-card">
         <div class="bb-card-header">
           <div>
-            <h2>인바디 기록 추가</h2>
-            <p>CSV 일괄 등록을 우선 지원하며, 원본 파일은 저장하지 않습니다.</p>
+            <h2>현재 변화</h2>
+            <p>첫 기록과 최근 기록을 비교합니다.</p>
+          </div>
+        </div>
+        <div id="bbSummary"></div>
+      </section>
+
+      <section class="bb-card">
+        <div class="bb-card-header">
+          <div>
+            <h2>체성분 추세</h2>
+            <p>체지방량과 골격근량을 같은 기간에서 비교합니다.</p>
+          </div>
+        </div>
+        <canvas id="bbChart" class="bb-chart"></canvas>
+        <div class="bb-legend">
+          <span><i></i>체지방량</span>
+          <span class="muscle"><i></i>골격근량</span>
+        </div>
+      </section>
+
+      <section class="bb-card">
+        <div class="bb-card-header">
+          <div>
+            <h2>인바디 기록</h2>
+            <p id="bbRecordCount">0건</p>
+          </div>
+        </div>
+        <div id="bbRecordList"></div>
+      </section>
+
+      <section id="bbInputSection" class="bb-card bb-input-section">
+        <div class="bb-card-header">
+          <div>
+            <h2>인바디 데이터 등록</h2>
+            <p>원본 파일은 저장하지 않고 숫자 기록만 보관합니다.</p>
           </div>
         </div>
 
@@ -151,80 +212,36 @@
             </button>
           </div>
         </div>
-      </section>
 
-      <section id="bbManualCard" class="bb-card" hidden>
-        <div class="bb-card-header">
-          <div>
-            <h2 id="bbManualTitle">직접 입력</h2>
-            <p>수치는 저장 전에 직접 확인할 수 있습니다.</p>
+        <section id="bbManualCard" class="bb-manual-inline" hidden>
+          <div class="bb-card-header">
+            <div>
+              <h2 id="bbManualTitle">직접 입력</h2>
+              <p>수치는 저장 전에 직접 확인할 수 있습니다.</p>
+            </div>
           </div>
-        </div>
 
-        <div class="bb-form-grid">
-          ${field("bbDate", "측정일", "date", "", "full")}
-          ${field("bbWeight", "체중 (kg)", "number", "예: 61.8")}
-          ${field("bbMuscle", "골격근량 (kg)", "number", "예: 22.7")}
-          ${field("bbFatMass", "체지방량 (kg)", "number", "예: 17.2")}
-          ${field("bbFatRate", "체지방률 (%)", "number", "예: 27.8")}
-        </div>
-
-        <div class="bb-form-actions">
-          <button id="bbManualCancel" class="bb-button ghost" type="button">
-            취소
-          </button>
-          <button id="bbManualSave" class="bb-button" type="button">
-            저장
-          </button>
-        </div>
-      </section>
-
-      <section class="bb-card bb-integrated-card">
-        <div class="bb-card-header">
-          <div>
-            <span class="bb-status-kicker">RUN × BODY</span>
-            <h2>Sub60 통합 판정</h2>
-            <p>최근 인바디와 러닝 기록을 함께 봅니다.</p>
+          <div class="bb-form-grid">
+            ${field("bbDate", "측정일", "date", "", "full")}
+            ${field("bbWeight", "체중 (kg)", "number", "예: 61.8")}
+            ${field("bbMuscle", "골격근량 (kg)", "number", "예: 22.7")}
+            ${field("bbFatMass", "체지방량 (kg)", "number", "예: 17.2")}
+            ${field("bbFatRate", "체지방률 (%)", "number", "예: 27.8")}
           </div>
-        </div>
-        <div id="bbIntegratedStatus"></div>
-      </section>
 
-      <section class="bb-card">
-        <div class="bb-card-header">
-          <div>
-            <h2>현재 변화</h2>
-            <p>첫 기록과 최근 기록을 비교합니다.</p>
+          <div class="bb-form-actions">
+            <button id="bbManualCancel" class="bb-button ghost" type="button">
+              취소
+            </button>
+            <button id="bbManualSave" class="bb-button" type="button">
+              저장
+            </button>
           </div>
-        </div>
-        <div id="bbSummary"></div>
-      </section>
-
-      <section class="bb-card">
-        <div class="bb-card-header">
-          <div>
-            <h2>체성분 추세</h2>
-            <p>체지방량과 골격근량을 같은 기간에서 비교합니다.</p>
-          </div>
-        </div>
-        <canvas id="bbChart" class="bb-chart"></canvas>
-        <div class="bb-legend">
-          <span><i></i>체지방량</span>
-          <span class="muscle"><i></i>골격근량</span>
-        </div>
-      </section>
-
-      <section class="bb-card">
-        <div class="bb-card-header">
-          <div>
-            <h2>인바디 기록</h2>
-            <p id="bbRecordCount">0건</p>
-          </div>
-        </div>
-        <div id="bbRecordList"></div>
+        </section>
       </section>
     `;
   }
+
 
   function field(id, label, type, placeholder, extraClass = "") {
     return `
@@ -263,6 +280,9 @@
     document.getElementById("bbCancelImport")
       ?.addEventListener("click", resetCsvPreview);
 
+    document.getElementById("bbGoToInput")
+      ?.addEventListener("click", scrollToInputSection);
+
     document.getElementById("bbManualOpen")
       ?.addEventListener("click", () => openManualForm());
 
@@ -276,6 +296,24 @@
       ?.addEventListener("click", handleRecordAction);
 
     window.addEventListener("resize", debounce(drawChart, 120));
+  }
+
+  function scrollToInputSection() {
+    const target = document.getElementById("bbInputSection");
+    if (!target) return;
+
+    target.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+    target.classList.remove("is-highlighted");
+    requestAnimationFrame(() => {
+      target.classList.add("is-highlighted");
+      window.setTimeout(() => {
+        target.classList.remove("is-highlighted");
+      }, 1400);
+    });
   }
 
   function switchTab(tab) {
@@ -1008,11 +1046,172 @@
 
   function refreshBalanceView() {
     renderIntegratedStatus();
+    renderConnectionAnalysis();
     renderSummary();
     renderRecordList();
     requestAnimationFrame(drawChart);
   }
 
+
+  function renderConnectionAnalysis() {
+    const container = document.getElementById("bbConnectionAnalysis");
+    if (!container) return;
+
+    const body = getBodyTrend(getRecords());
+    const logs = Array.isArray(window.appData?.logs)
+      ? [...window.appData.logs]
+      : (typeof appData !== "undefined" && Array.isArray(appData.logs)
+          ? [...appData.logs]
+          : []);
+    const run = getRunTrend(logs);
+
+    if (!body.available || !run.available) {
+      container.innerHTML = `
+        <div class="bb-connection-empty">
+          <b>연결 분석을 준비하고 있습니다.</b>
+          <p>
+            인바디 2회 이상과 유효한 러닝 기록 2회 이상이 필요합니다.
+            기록이 쌓이면 체지방·근육 변화와 러닝 흐름을 함께 설명합니다.
+          </p>
+          <div class="bb-connection-counts">
+            <span>인바디 ${body.count}회</span>
+            <span>러닝 ${run.count}회</span>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    const fatText = formatConnectionDelta(body.fatDelta, "kg");
+    const muscleText = formatConnectionDelta(body.muscleDelta, "kg");
+    const paceText = run.paceDelta === null
+      ? "비교 대기"
+      : run.paceDelta > 0
+        ? `${Math.round(run.paceDelta)}초/km 개선`
+        : run.paceDelta < 0
+          ? `${Math.round(Math.abs(run.paceDelta))}초/km 저하`
+          : "변화 없음";
+
+    const interpretation = getConnectionInterpretation(body, run);
+
+    container.innerHTML = `
+      <div class="bb-connection-analysis ${interpretation.className}">
+        <div class="bb-connection-metrics">
+          <div>
+            <span>체지방량</span>
+            <b>${fatText}</b>
+          </div>
+          <div>
+            <span>골격근량</span>
+            <b>${muscleText}</b>
+          </div>
+          <div>
+            <span>러닝 페이스</span>
+            <b>${paceText}</b>
+          </div>
+        </div>
+
+        <div class="bb-connection-copy">
+          <span>${interpretation.label}</span>
+          <h3>${interpretation.title}</h3>
+          <p>${interpretation.message}</p>
+        </div>
+
+        <small>
+          ${interpretation.note}
+        </small>
+      </div>
+    `;
+  }
+
+  function formatConnectionDelta(value, unit) {
+    if (value === null) return "비교 대기";
+    const sign = value > 0 ? "+" : "";
+    return `${sign}${value.toFixed(1)}${unit}`;
+  }
+
+  function getConnectionInterpretation(body, run) {
+    const fatDown = body.fatDelta !== null && body.fatDelta <= -0.3;
+    const fatUp = body.fatDelta !== null && body.fatDelta >= 0.5;
+    const muscleSafe =
+      body.muscleDelta === null || body.muscleDelta >= -0.3;
+    const muscleDown =
+      body.muscleDelta !== null && body.muscleDelta <= -0.5;
+    const paceBetter =
+      run.paceDelta !== null && run.paceDelta >= 5;
+    const paceWorse =
+      run.paceDelta !== null && run.paceDelta <= -5;
+
+    if (fatDown && muscleSafe && paceBetter) {
+      return {
+        label: "함께 개선되는 흐름",
+        title: "몸의 부담은 줄고 러닝 효율은 좋아지고 있습니다.",
+        message:
+          "체지방량 감소, 골격근량 유지, 페이스 개선이 같은 방향으로 나타났습니다.",
+        note:
+          "연관성은 확인되지만 체성분 변화가 페이스 향상의 직접 원인이라고 단정하지는 않습니다.",
+        className: "is-positive"
+      };
+    }
+
+    if (fatDown && muscleSafe && !paceWorse) {
+      return {
+        label: "좋은 기반 형성",
+        title: "체성분은 Sub60에 유리한 방향으로 움직이고 있습니다.",
+        message:
+          "체지방량은 감소하고 골격근량은 유지됐습니다. 러닝 기록의 추가 변화를 지켜볼 단계입니다.",
+        note:
+          "같은 거리와 비슷한 심박 조건의 러닝이 쌓이면 연결 분석의 신뢰도가 높아집니다.",
+        className: "is-positive"
+      };
+    }
+
+    if (muscleDown && paceWorse) {
+      return {
+        label: "함께 저하되는 흐름",
+        title: "근육 감소와 페이스 저하가 동시에 나타났습니다.",
+        message:
+          "감량 속도, 회복 부족 또는 영양 상태가 러닝 컨디션에 영향을 줬을 가능성이 있습니다.",
+        note:
+          "수면, 기온, 코스, 운동 강도 등 다른 요인도 함께 확인해야 합니다.",
+        className: "is-warning"
+      };
+    }
+
+    if (fatUp && paceWorse) {
+      return {
+        label: "생활 흐름 점검",
+        title: "체지방과 러닝 기록이 모두 좋지 않은 방향입니다.",
+        message:
+          "단기 피로, 식사 리듬 또는 훈련 공백의 영향을 점검하는 것이 좋습니다.",
+        note:
+          "한 번의 인바디 측정만으로 식사량을 급격히 줄이지 마세요.",
+        className: "is-warning"
+      };
+    }
+
+    if (fatDown && paceWorse) {
+      return {
+        label: "방향이 엇갈림",
+        title: "체지방은 줄었지만 러닝 페이스는 떨어졌습니다.",
+        message:
+          "감량 자체보다 피로, 회복, 날씨 또는 코스 영향이 더 컸을 수 있습니다.",
+        note:
+          "현재 데이터로는 체성분과 러닝 변화의 직접적인 연결을 판단하기 어렵습니다.",
+        className: "is-neutral"
+      };
+    }
+
+    return {
+      label: "추가 관찰 필요",
+      title: "아직 뚜렷한 연결 패턴은 보이지 않습니다.",
+      message:
+        "체성분과 러닝 기록이 서로 다른 방향으로 움직이거나 변화 폭이 작습니다.",
+      note:
+        "2~4주간 같은 조건의 인바디와 러닝 기록을 더 모으면 패턴을 확인할 수 있습니다.",
+      className: "is-neutral"
+    };
+  }
 
   function renderIntegratedStatus() {
     const container = document.getElementById("bbIntegratedStatus");
