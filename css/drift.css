@@ -855,7 +855,15 @@
   background: rgba(255, 255, 255, .055);
 }
 
-.settings-item b { display: block; }
+.settings-item > div {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.settings-item b {
+  display: block;
+  word-break: keep-all;
+}
 .settings-item p {
   margin: 6px 0 0;
   color: var(--muted, #8fa0b8);
@@ -865,6 +873,8 @@
 
 .danger-button {
   flex: 0 0 auto;
+  width: auto;
+  min-width: 112px;
   border: 0;
   border-radius: 12px;
   padding: 11px 14px;
@@ -881,7 +891,7 @@
   font-size: 12px;
 }
 
-@media (max-width: 520px) {
+@media (max-width: 640px) {
   .settings-sheet { margin: 0; border-radius: 24px 24px 0 0; }
   .settings-item { align-items: stretch; flex-direction: column; }
   .danger-button { width: 100%; }
