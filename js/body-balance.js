@@ -4,6 +4,9 @@
   const STORAGE_KEY = "sub60-body-balance-v1";
   let pendingRows = [];
   let editingDate = null;
+  let selectedInbodyFile = null;
+  let selectedInbodyUrl = null;
+  let isReadingInbody = false;
 
   const originalRenderApp = window.renderApp;
   const originalBind = window.bind;
@@ -89,22 +92,38 @@
         </div>
 
         <div class="bb-actions">
-          <label class="bb-file-button" for="bbCsvInput">
-            CSV 여러 기록 가져오기
-            <input id="bbCsvInput" type="file" accept=".csv,text/csv">
+          <label class="bb-file-button" for="bbInbodyCapture">
+            인바디 캡처 가져오기
+            <input id="bbInbodyCapture" type="file" accept="image/*">
           </label>
           <button id="bbManualOpen" class="bb-button secondary" type="button">
             직접 입력
           </button>
-          <button id="bbScreenshotSoon" class="bb-button ghost" type="button">
-            스크린샷 등록 · 2차
-          </button>
+          <label class="bb-file-button bb-file-button-sub" for="bbCsvInput">
+            CSV 가져오기
+            <input id="bbCsvInput" type="file" accept=".csv,text/csv">
+          </label>
         </div>
 
         <p class="bb-help">
-          자동 탐색 항목: 측정일, 체중, 골격근량, 체지방량, 체지방률.
-          CSV 형식이 달라도 한국어·영문 열 이름을 최대한 자동으로 찾습니다.
+          캡처에서 체중·골격근량·체지방량을 읽고, 체지방률은 자동 계산합니다.
+          측정일은 오늘로 입력되며 저장 전에 수정할 수 있습니다.
         </p>
+
+        <div id="bbCapturePreview" class="bb-capture-preview" hidden>
+          <img id="bbCaptureImage" alt="선택한 인바디 캡처 미리보기">
+          <div id="bbCaptureStatus" class="bb-capture-status">
+            캡처를 확인한 뒤 숫자 읽기를 눌러 주세요.
+          </div>
+          <div class="bb-form-actions">
+            <button id="bbCaptureCancel" class="bb-button ghost" type="button">
+              다시 선택
+            </button>
+            <button id="bbCaptureRead" class="bb-button" type="button">
+              숫자 읽기
+            </button>
+          </div>
+        </div>
 
         <div id="bbCsvPreview" class="bb-preview-wrap">
           <div id="bbPreviewMeta" class="bb-preview-meta"></div>
@@ -215,6 +234,15 @@
       button.addEventListener("click", () => switchTab(button.dataset.bbTab));
     });
 
+    document.getElementById("bbInbodyCapture")
+      ?.addEventListener("change", handleInbodyCapture);
+
+    document.getElementById("bbCaptureRead")
+      ?.addEventListener("click", readInbodyCapture);
+
+    document.getElementById("bbCaptureCancel")
+      ?.addEventListener("click", clearInbodyCapture);
+
     document.getElementById("bbCsvInput")
       ?.addEventListener("change", handleCsvFile);
 
@@ -232,11 +260,6 @@
 
     document.getElementById("bbManualSave")
       ?.addEventListener("click", saveManualRecord);
-
-    document.getElementById("bbScreenshotSoon")
-      ?.addEventListener("click", () => {
-        toast("스크린샷 자동 인식은 다음 업데이트에 추가됩니다.");
-      });
 
     document.getElementById("bbRecordList")
       ?.addEventListener("click", handleRecordAction);
@@ -303,6 +326,287 @@
 
   function sortByDate(a, b) {
     return a.date.localeCompare(b.date);
+  }
+
+
+  function handleInbodyCapture(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("인바디 캡처 이미지를 선택해 주세요.");
+      event.target.value = "";
+      return;
+    }
+
+    clearInbodyCapture(false);
+    selectedInbodyFile = file;
+    selectedInbodyUrl = URL.createObjectURL(file);
+
+    const preview = document.getElementById("bbCapturePreview");
+    const image = document.getElementById("bbCaptureImage");
+    const status = document.getElementById("bbCaptureStatus");
+
+    if (image) image.src = selectedInbodyUrl;
+    if (status) status.textContent = "캡처를 확인한 뒤 숫자 읽기를 눌러 주세요.";
+    if (preview) preview.hidden = false;
+  }
+
+  function clearInbodyCapture(resetInput = true) {
+    if (selectedInbodyUrl) {
+      URL.revokeObjectURL(selectedInbodyUrl);
+    }
+
+    selectedInbodyFile = null;
+    selectedInbodyUrl = null;
+    isReadingInbody = false;
+
+    const input = document.getElementById("bbInbodyCapture");
+    const preview = document.getElementById("bbCapturePreview");
+    const image = document.getElementById("bbCaptureImage");
+    const status = document.getElementById("bbCaptureStatus");
+    const readButton = document.getElementById("bbCaptureRead");
+
+    if (resetInput && input) input.value = "";
+    if (image) image.removeAttribute("src");
+    if (preview) preview.hidden = true;
+    if (status) status.textContent = "캡처를 확인한 뒤 숫자 읽기를 눌러 주세요.";
+    if (readButton) {
+      readButton.disabled = false;
+      readButton.textContent = "숫자 읽기";
+    }
+  }
+
+  async function readInbodyCapture() {
+    if (isReadingInbody) return;
+
+    if (!selectedInbodyFile) {
+      alert("인바디 캡처 이미지를 먼저 선택해 주세요.");
+      return;
+    }
+
+    const status = document.getElementById("bbCaptureStatus");
+    const readButton = document.getElementById("bbCaptureRead");
+    let worker = null;
+
+    try {
+      isReadingInbody = true;
+      if (readButton) {
+        readButton.disabled = true;
+        readButton.textContent = "읽는 중...";
+      }
+      if (status) status.textContent = "OCR 준비 중...";
+
+      await ensureInbodyTesseract();
+      const image = await loadInbodyImage(selectedInbodyFile);
+      const crops = createInbodyCrops(image);
+
+      worker = await Tesseract.createWorker("eng", 1, {
+        logger(message) {
+          if (message.status === "recognizing text" && status) {
+            status.textContent =
+              `숫자 읽는 중... ${Math.round((message.progress || 0) * 100)}%`;
+          }
+        }
+      });
+
+      await worker.setParameters({
+        tessedit_pageseg_mode: "7",
+        tessedit_char_whitelist: "0123456789.",
+        preserve_interword_spaces: "0"
+      });
+
+      const values = {};
+
+      for (let index = 0; index < crops.length; index += 1) {
+        const crop = crops[index];
+        if (status) status.textContent = `${crop.label} 읽는 중...`;
+
+        const result = await worker.recognize(crop.canvas);
+        values[crop.key] = parseInbodyMetric(
+          result.data.text,
+          crop.min,
+          crop.max
+        );
+      }
+
+      const missing = ["weight", "muscle", "fatMass"]
+        .filter(key => values[key] === null);
+
+      if (missing.length === 3) {
+        throw new Error(
+          "숫자를 읽지 못했습니다. 체중·골격근량·체지방량이 모두 보이는 화면을 올려 주세요."
+        );
+      }
+
+      const fatRate =
+        values.weight !== null &&
+        values.weight > 0 &&
+        values.fatMass !== null
+          ? Math.round((values.fatMass / values.weight) * 1000) / 10
+          : null;
+
+      openManualForm({
+        date: todayString(),
+        weight: values.weight,
+        muscle: values.muscle,
+        fatMass: values.fatMass,
+        fatRate
+      });
+
+      const title = document.getElementById("bbManualTitle");
+      if (title) title.textContent = "캡처 인식 결과 확인";
+
+      if (status) {
+        status.textContent = missing.length
+          ? "일부 항목을 읽지 못했습니다. 아래 결과에서 직접 입력해 주세요."
+          : "인식 완료. 아래 결과를 확인한 뒤 저장해 주세요.";
+      }
+
+      toast("인바디 캡처를 읽었습니다.");
+    } catch (error) {
+      console.error(error);
+      if (status) status.textContent = "인식에 실패했습니다.";
+      alert(error.message || "인바디 캡처를 읽지 못했습니다.");
+    } finally {
+      if (worker) {
+        try {
+          await worker.terminate();
+        } catch {}
+      }
+
+      isReadingInbody = false;
+      if (readButton) {
+        readButton.disabled = false;
+        readButton.textContent = "숫자 다시 읽기";
+      }
+    }
+  }
+
+  function ensureInbodyTesseract() {
+    if (window.Tesseract) return Promise.resolve();
+
+    if (window.__sub60InbodyTesseractPromise) {
+      return window.__sub60InbodyTesseractPromise;
+    }
+
+    window.__sub60InbodyTesseractPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src =
+        "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+      script.async = true;
+      script.onload = () => resolve();
+      script.onerror = () => reject(
+        new Error("OCR 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인해 주세요.")
+      );
+      document.head.appendChild(script);
+    });
+
+    return window.__sub60InbodyTesseractPromise;
+  }
+
+  function loadInbodyImage(file) {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      const url = URL.createObjectURL(file);
+
+      image.onload = () => {
+        URL.revokeObjectURL(url);
+        resolve(image);
+      };
+
+      image.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error("이미지를 열지 못했습니다."));
+      };
+
+      image.src = url;
+    });
+  }
+
+  function createInbodyCrops(image) {
+    /*
+     * 보람 님이 제공한 인바디 앱 캡처 형식 기준:
+     * 왼쪽 숫자 영역을 체중 / 골격근량 / 체지방량 순서로 자릅니다.
+     */
+    const regions = [
+      { key: "weight", label: "체중", x: 0.035, y: 0.085, w: 0.20, h: 0.12, min: 25, max: 250 },
+      { key: "muscle", label: "골격근량", x: 0.035, y: 0.415, w: 0.20, h: 0.12, min: 5, max: 100 },
+      { key: "fatMass", label: "체지방량", x: 0.035, y: 0.745, w: 0.20, h: 0.12, min: 1, max: 150 }
+    ];
+
+    return regions.map(region => ({
+      ...region,
+      canvas: cropAndEnhanceInbody(image, region)
+    }));
+  }
+
+  function cropAndEnhanceInbody(image, region) {
+    const sourceX = Math.round(image.naturalWidth * region.x);
+    const sourceY = Math.round(image.naturalHeight * region.y);
+    const sourceWidth = Math.round(image.naturalWidth * region.w);
+    const sourceHeight = Math.round(image.naturalHeight * region.h);
+    const scale = 3;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = sourceWidth * scale;
+    canvas.height = sourceHeight * scale;
+
+    const context = canvas.getContext("2d", { willReadFrequently: true });
+    context.imageSmoothingEnabled = false;
+    context.drawImage(
+      image,
+      sourceX,
+      sourceY,
+      sourceWidth,
+      sourceHeight,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+
+    for (let index = 0; index < data.length; index += 4) {
+      const gray =
+        data[index] * 0.299 +
+        data[index + 1] * 0.587 +
+        data[index + 2] * 0.114;
+
+      const value = gray < 185 ? 0 : 255;
+      data[index] = value;
+      data[index + 1] = value;
+      data[index + 2] = value;
+      data[index + 3] = 255;
+    }
+
+    context.putImageData(imageData, 0, 0);
+    return canvas;
+  }
+
+  function parseInbodyMetric(rawText, min, max) {
+    const cleaned = String(rawText || "")
+      .replace(/,/g, ".")
+      .replace(/[^0-9.]/g, "");
+
+    const candidates = [];
+
+    const decimals = cleaned.match(/\d{1,3}\.\d/g) || [];
+    decimals.forEach(value => candidates.push(Number(value)));
+
+    const digits = cleaned.replace(/\D/g, "");
+    if (digits.length >= 2 && digits.length <= 4) {
+      candidates.push(Number(digits));
+      candidates.push(Number(digits) / 10);
+    }
+
+    const valid = candidates.find(
+      value => Number.isFinite(value) && value >= min && value <= max
+    );
+
+    return valid === undefined ? null : Math.round(valid * 10) / 10;
   }
 
   async function handleCsvFile(event) {
@@ -706,7 +1010,7 @@
     if (!records.length) {
       container.innerHTML = `
         <p class="bb-empty">
-          인바디 CSV를 가져오거나 최근 측정값을 직접 입력해 주세요.
+          인바디 캡처를 가져오거나 최근 측정값을 직접 입력해 주세요.
         </p>
       `;
       return;
