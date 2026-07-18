@@ -427,3 +427,149 @@
     grid-column: auto;
   }
 }
+
+
+/* =========================================================
+   v2 mobile collision fix
+   기존 Sub60 전역 article/button/b 스타일의 영향을 차단합니다.
+   ========================================================= */
+
+#bbBalancePanel,
+#bbBalancePanel * {
+  box-sizing: border-box;
+}
+
+#bbBalancePanel article.bb-record {
+  margin: 0 !important;
+  padding: 14px !important;
+  min-height: 0 !important;
+  border: 1px solid var(--bb-line) !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  color: #26332f !important;
+}
+
+#bbBalancePanel .bb-record-list {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+#bbBalancePanel .bb-record {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+#bbBalancePanel .bb-record-main {
+  display: block !important;
+  min-width: 0 !important;
+}
+
+#bbBalancePanel .bb-record-main > b {
+  display: block !important;
+  margin: 0 0 8px !important;
+  padding: 0 !important;
+  color: #26332f !important;
+  font-size: 15px !important;
+  line-height: 1.25 !important;
+  font-weight: 850 !important;
+  background: transparent !important;
+}
+
+#bbBalancePanel .bb-record-values {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 6px 12px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #6d7773 !important;
+  font-size: 13px !important;
+  line-height: 1.35 !important;
+}
+
+#bbBalancePanel .bb-record-values span {
+  display: block !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #6d7773 !important;
+  background: transparent !important;
+  white-space: nowrap !important;
+}
+
+#bbBalancePanel .bb-record-actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, auto) !important;
+  align-items: center !important;
+  gap: 7px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#bbBalancePanel button.bb-icon-button {
+  width: auto !important;
+  min-width: 54px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  margin: 0 !important;
+  padding: 0 12px !important;
+  border: 0 !important;
+  border-radius: 11px !important;
+  background: var(--bb-primary-soft) !important;
+  color: var(--bb-primary) !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  font-weight: 850 !important;
+  letter-spacing: 0 !important;
+  white-space: nowrap !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+}
+
+#bbBalancePanel button.bb-icon-button[data-bb-action="delete"] {
+  background: #fff0ef !important;
+  color: var(--bb-danger) !important;
+}
+
+#bbBalancePanel .bb-card {
+  overflow: hidden !important;
+}
+
+#bbBalancePanel .bb-card-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+}
+
+#bbBalancePanel #bbRecordCount {
+  display: block !important;
+  margin: 5px 0 0 !important;
+  color: var(--bb-muted) !important;
+  font-size: 13px !important;
+}
+
+@media (max-width: 520px) {
+  #bbBalancePanel .bb-record {
+    grid-template-columns: 1fr !important;
+  }
+
+  #bbBalancePanel .bb-record-actions {
+    grid-template-columns: 1fr 1fr !important;
+    width: 100% !important;
+  }
+
+  #bbBalancePanel button.bb-icon-button {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+
+@media (max-width: 360px) {
+  #bbBalancePanel .bb-record-values {
+    grid-template-columns: 1fr !important;
+  }
+}
