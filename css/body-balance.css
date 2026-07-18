@@ -1004,3 +1004,49 @@
     flex-direction: column !important;
   }
 }
+
+
+/* =========================================================
+   v6.1 all body-balance headings visibility fix
+   ========================================================= */
+#bbBalancePanel h1,
+#bbBalancePanel h2,
+#bbBalancePanel h3,
+#bbBalancePanel .bb-card-header h2,
+#bbBalancePanel .bb-card-header h3,
+#bbBalancePanel .bb-integrated-card h2,
+#bbBalancePanel .bb-connection-card h2,
+#bbBalancePanel .bb-input-section h2,
+#bbBalancePanel .bb-manual-inline h2 {
+  color: #213a32 !important;
+  -webkit-text-fill-color: #213a32 !important;
+  background: none !important;
+  background-image: none !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  mix-blend-mode: normal !important;
+}
+
+#bbBalancePanel .bb-card-header p,
+#bbBalancePanel .bb-integrated-card .bb-card-header p,
+#bbBalancePanel .bb-connection-card .bb-card-header p,
+#bbBalancePanel .bb-input-section .bb-card-header p {
+  color: #66736e !important;
+  -webkit-text-fill-color: #66736e !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  text-shadow: none !important;
+}
+
+#bbBalancePanel .bb-status-kicker {
+  color: #315d4f !important;
+  -webkit-text-fill-color: #315d4f !important;
+  opacity: 1 !important;
+}
+
+/* hero title keeps its original light-on-dark treatment */
+#bbBalancePanel .bb-hero h1 {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
