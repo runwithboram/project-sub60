@@ -179,6 +179,17 @@
         </div>
       </section>
 
+      <section class="bb-card bb-integrated-card">
+        <div class="bb-card-header">
+          <div>
+            <span class="bb-status-kicker">RUN × BODY</span>
+            <h2>Sub60 통합 판정</h2>
+            <p>최근 인바디와 러닝 기록을 함께 봅니다.</p>
+          </div>
+        </div>
+        <div id="bbIntegratedStatus"></div>
+      </section>
+
       <section class="bb-card">
         <div class="bb-card-header">
           <div>
@@ -996,9 +1007,375 @@
   }
 
   function refreshBalanceView() {
+    renderIntegratedStatus();
     renderSummary();
     renderRecordList();
     requestAnimationFrame(drawChart);
+  }
+
+
+  function renderIntegratedStatus() {
+    const container = document.getElementById("bbIntegratedStatus");
+    if (!container) return;
+
+    const bodyRecords = getRecords();
+    const runningLogs = Array.isArray(window.appData?.logs)
+      ? [...window.appData.logs]
+      : (typeof appData !== "undefined" && Array.isArray(appData.logs)
+          ? [...appData.logs]
+          : []);
+
+    const bodyTrend = getBodyTrend(bodyRecords);
+    const runTrend = getRunTrend(runningLogs);
+    const status = getIntegratedVerdict(bodyTrend, runTrend);
+
+    container.innerHTML = `
+      <div class="bb-integrated-status ${status.className}">
+        <span class="bb-status-badge">${status.badge}</span>
+        <h3>${status.title}</h3>
+        <p>${status.message}</p>
+
+        <div class="bb-status-evidence">
+          ${status.evidence.map(item => `
+            <div class="${item.tone}">
+              <span>${item.label}</span>
+              <b>${item.value}</b>
+            </div>
+          `).join("")}
+        </div>
+
+        <small class="bb-status-note">${status.note}</small>
+      </div>
+    `;
+  }
+
+  function getBodyTrend(records) {
+    if (!records.length) {
+      return {
+        available: false,
+        count: 0,
+        fatDelta: null,
+        muscleDelta: null,
+        weightDelta: null
+      };
+    }
+
+    const first = records[0];
+    const latest = records[records.length - 1];
+
+    return {
+      available: records.length >= 2,
+      count: records.length,
+      fatDelta: delta(latest.fatMass, first.fatMass),
+      muscleDelta: delta(latest.muscle, first.muscle),
+      weightDelta: delta(latest.weight, first.weight)
+    };
+  }
+
+  function getRunTrend(logs) {
+    const valid = logs
+      .filter(log =>
+        Number(log.distance) > 0 &&
+        inbodyValidRunTime(log.time)
+      )
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    if (!valid.length) {
+      return {
+        available: false,
+        count: 0,
+        paceDelta: null,
+        recentDistance: 0,
+        previousDistance: 0
+      };
+    }
+
+    const recent = valid.slice(0, 4);
+    const previous = valid.slice(4, 8);
+
+    const recentDistance = recent.reduce(
+      (sum, log) => sum + Number(log.distance || 0),
+      0
+    );
+
+    const previousDistance = previous.reduce(
+      (sum, log) => sum + Number(log.distance || 0),
+      0
+    );
+
+    const recentPace = weightedRunPace(recent);
+    const previousPace = weightedRunPace(previous);
+
+    return {
+      available: recent.length >= 2,
+      count: valid.length,
+      paceDelta:
+        recentPace !== null && previousPace !== null
+          ? previousPace - recentPace
+          : null,
+      recentDistance: Math.round(recentDistance * 10) / 10,
+      previousDistance: Math.round(previousDistance * 10) / 10
+    };
+  }
+
+  function weightedRunPace(logs) {
+    if (!logs.length) return null;
+
+    const distance = logs.reduce(
+      (sum, log) => sum + Number(log.distance || 0),
+      0
+    );
+
+    const seconds = logs.reduce(
+      (sum, log) => sum + inbodyRunSeconds(log.time),
+      0
+    );
+
+    return distance > 0 && seconds > 0
+      ? seconds / distance
+      : null;
+  }
+
+  function inbodyValidRunTime(time) {
+    const parts = String(time || "").split(":").map(Number);
+
+    if (
+      parts.length < 2 ||
+      parts.length > 3 ||
+      parts.some(Number.isNaN)
+    ) {
+      return false;
+    }
+
+    return parts.every((value, index) =>
+      index === 0 ? value >= 0 : value >= 0 && value < 60
+    );
+  }
+
+  function inbodyRunSeconds(time) {
+    const parts = String(time || "").split(":").map(Number);
+
+    if (parts.length === 2) {
+      return parts[0] * 60 + parts[1];
+    }
+
+    if (parts.length === 3) {
+      return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    }
+
+    return 0;
+  }
+
+  function getIntegratedVerdict(body, run) {
+    const bodyReady = body.available;
+    const runReady = run.available;
+
+    if (!bodyReady && !runReady) {
+      return {
+        badge: "START",
+        title: "기준 기록을 쌓는 중입니다.",
+        message:
+          "인바디 2회 이상과 러닝 기록 2회 이상이 쌓이면 Sub60 관점의 통합 판정을 시작합니다.",
+        className: "is-neutral",
+        evidence: [
+          {
+            label: "인바디",
+            value: `${body.count}회`,
+            tone: "is-neutral"
+          },
+          {
+            label: "러닝",
+            value: `${run.count}회`,
+            tone: "is-neutral"
+          }
+        ],
+        note: "한 번의 수치보다 반복 측정의 흐름을 중요하게 봅니다."
+      };
+    }
+
+    const fatDown = body.fatDelta !== null && body.fatDelta <= -0.3;
+    const fatUp = body.fatDelta !== null && body.fatDelta >= 0.5;
+    const muscleSafe =
+      body.muscleDelta === null || body.muscleDelta >= -0.3;
+    const muscleLoss =
+      body.muscleDelta !== null && body.muscleDelta <= -0.5;
+    const paceBetter =
+      run.paceDelta !== null && run.paceDelta >= 5;
+    const paceWorse =
+      run.paceDelta !== null && run.paceDelta <= -5;
+    const mileageUp =
+      run.previousDistance > 0 &&
+      run.recentDistance >= run.previousDistance + 2;
+
+    if (fatDown && muscleSafe && paceBetter) {
+      return {
+        badge: "BEST FLOW",
+        title: "가벼워지면서 빨라지고 있습니다.",
+        message:
+          "체지방은 줄고 골격근량은 유지되며, 최근 러닝 페이스도 좋아졌습니다. Sub60에 가장 이상적인 흐름입니다.",
+        className: "is-best",
+        evidence: [
+          evidenceDelta("체지방량", body.fatDelta, "kg", "good"),
+          evidenceDelta("골격근량", body.muscleDelta, "kg", "good"),
+          evidencePace(run.paceDelta)
+        ],
+        note: "현재 식사와 훈련 강도를 무리하게 바꾸지 않는 것이 좋습니다."
+      };
+    }
+
+    if (fatDown && muscleSafe) {
+      return {
+        badge: "GOOD CUT",
+        title: "러닝에 좋은 감량 흐름입니다.",
+        message:
+          "체지방 부담은 줄고 추진력에 필요한 골격근량은 유지되고 있습니다.",
+        className: "is-good",
+        evidence: [
+          evidenceDelta("체지방량", body.fatDelta, "kg", "good"),
+          evidenceDelta("골격근량", body.muscleDelta, "kg", "good"),
+          {
+            label: "최근 러닝",
+            value: runReady ? "흐름 확인 중" : "기록 필요",
+            tone: "is-neutral"
+          }
+        ],
+        note: "러닝 페이스 변화가 함께 확인되면 통합 판정이 더 정교해집니다."
+      };
+    }
+
+    if (muscleLoss) {
+      return {
+        badge: "RECOVERY FIRST",
+        title: "감량 속도를 조절해야 합니다.",
+        message:
+          "체중이나 체지방이 줄었더라도 골격근량 감소 폭이 큽니다. 회복과 영양을 먼저 점검하세요.",
+        className: "is-warning",
+        evidence: [
+          evidenceDelta("체지방량", body.fatDelta, "kg", "neutral"),
+          evidenceDelta("골격근량", body.muscleDelta, "kg", "bad"),
+          {
+            label: "권장",
+            value: "회복 우선",
+            tone: "is-bad"
+          }
+        ],
+        note: "단백질 섭취, 운동일 탄수화물, 수면 상태를 함께 확인하세요."
+      };
+    }
+
+    if (mileageUp && muscleSafe) {
+      return {
+        badge: "BASE UP",
+        title: "지구력 기반이 강화되고 있습니다.",
+        message:
+          "최근 러닝 거리가 늘었지만 골격근량은 안정적으로 유지되고 있습니다.",
+        className: "is-good",
+        evidence: [
+          {
+            label: "최근 4회 거리",
+            value: `${run.recentDistance.toFixed(1)}km`,
+            tone: "is-good"
+          },
+          evidenceDelta("골격근량", body.muscleDelta, "kg", "good"),
+          {
+            label: "훈련 상태",
+            value: "기반 강화",
+            tone: "is-good"
+          }
+        ],
+        note: "거리 증가와 함께 회복일을 유지하세요."
+      };
+    }
+
+    if (fatUp && paceWorse) {
+      return {
+        badge: "CHECK FLOW",
+        title: "회복과 식사 흐름을 점검할 때입니다.",
+        message:
+          "체지방량이 늘고 최근 러닝 페이스도 느려졌습니다. 단기 피로 또는 생활 리듬의 영향을 확인하세요.",
+        className: "is-warning",
+        evidence: [
+          evidenceDelta("체지방량", body.fatDelta, "kg", "bad"),
+          evidencePace(run.paceDelta),
+          {
+            label: "권장",
+            value: "컨디션 점검",
+            tone: "is-bad"
+          }
+        ],
+        note: "한 번의 인바디 수치만으로 식사량을 급격히 줄이지 마세요."
+      };
+    }
+
+    return {
+      badge: "BUILDING",
+      title: "Sub60 기반을 차근차근 쌓고 있습니다.",
+      message:
+        "현재 변화는 크지 않지만 위험 신호도 뚜렷하지 않습니다. 같은 조건의 기록을 조금 더 모아보세요.",
+      className: "is-neutral",
+      evidence: [
+        evidenceDelta("체지방량", body.fatDelta, "kg", "neutral"),
+        evidenceDelta("골격근량", body.muscleDelta, "kg", "neutral"),
+        {
+          label: "러닝 기록",
+          value: `${run.count}회`,
+          tone: "is-neutral"
+        }
+      ],
+      note: "2~4주 단위의 추세가 가장 신뢰할 만합니다."
+    };
+  }
+
+  function evidenceDelta(label, value, unit, preferredTone) {
+    if (value === null) {
+      return {
+        label,
+        value: "비교 대기",
+        tone: "is-neutral"
+      };
+    }
+
+    const sign = value > 0 ? "+" : "";
+    let tone = "is-neutral";
+
+    if (preferredTone === "good") {
+      tone = value >= -0.3 ? "is-good" : "is-bad";
+    } else if (preferredTone === "bad") {
+      tone = value <= -0.5 ? "is-bad" : "is-neutral";
+    }
+
+    return {
+      label,
+      value: `${sign}${value.toFixed(1)}${unit}`,
+      tone
+    };
+  }
+
+  function evidencePace(value) {
+    if (value === null) {
+      return {
+        label: "러닝 페이스",
+        value: "비교 대기",
+        tone: "is-neutral"
+      };
+    }
+
+    const seconds = Math.round(Math.abs(value));
+    return {
+      label: "러닝 페이스",
+      value:
+        value > 0
+          ? `${seconds}초/km 개선`
+          : value < 0
+            ? `${seconds}초/km 저하`
+            : "변화 없음",
+      tone:
+        value >= 5
+          ? "is-good"
+          : value <= -5
+            ? "is-bad"
+            : "is-neutral"
+    };
   }
 
   function renderSummary() {
