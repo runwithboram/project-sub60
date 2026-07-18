@@ -811,3 +811,24 @@
     grid-template-columns: 1fr !important;
   }
 }
+
+
+/* =========================================================
+   v5.1 integrated card title readability fix
+   ========================================================= */
+#bbBalancePanel .bb-integrated-card .bb-card-header h2 {
+  color: #213a32 !important;
+  background: transparent !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+
+#bbBalancePanel .bb-integrated-card .bb-card-header p {
+  color: #53615c !important;
+  opacity: 1 !important;
+}
+
+#bbBalancePanel .bb-integrated-card .bb-status-kicker {
+  color: #315d4f !important;
+  opacity: 1 !important;
+}
