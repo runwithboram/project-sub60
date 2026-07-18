@@ -450,3 +450,4 @@ button:active {
     grid-template-columns: 1fr;
   }
 }
+.app-footer{text-align:center;color:#51627d;font-size:12px;padding:8px 0 0}@media(max-width:640px){.app-shell{padding-left:14px;padding-right:14px;gap:14px}.dashboard-grid{grid-template-columns:1fr}.hero-card{padding:22px;flex-direction:column}.hero-time{text-align:left}.hero-time strong{font-size:34px}.efficiency-layout{align-items:center}.score-ring{width:128px;height:128px}.form-grid{grid-template-columns:1fr}.coach-plan{grid-template-columns:1fr}.topbar h1{font-size:21px}}@media(max-width:390px){.efficiency-layout{flex-direction:column;align-items:stretch}.score-ring{margin:auto}.metric-list{width:100%}.hero-card h2{font-size:23px}}
