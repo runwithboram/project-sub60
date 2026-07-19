@@ -21,15 +21,26 @@
     return `${remainder}초`;
   }
 
-  function applyHeroV103() {
+  function getGoalRecord() {
+    const raceTarget = Array.isArray(appData?.races)
+      ? appData.races.find(race => race?.target)?.target
+      : null;
+
+    return /^\d{1,2}:\d{2}(?::\d{2})?$/.test(String(raceTarget || ""))
+      ? raceTarget
+      : "59:59";
+  }
+
+  function applyHeroV1031() {
     const hero = document.querySelector(".hero");
-    if (!hero || !window.appData) return;
+    if (!hero || typeof appData === "undefined") return;
 
     const currentRecord = appData.records?.tenK || "1:02:17";
-    const goalRecord = appData.user?.goal || "59:59";
-    const gap = formatGap(
-      timeToSeconds(currentRecord) - timeToSeconds(goalRecord)
-    );
+    const goalRecord = getGoalRecord();
+    const currentSeconds = timeToSeconds(currentRecord);
+    const goalSeconds = timeToSeconds(goalRecord);
+    const gapSeconds = Math.max(0, currentSeconds - goalSeconds);
+    const gap = formatGap(gapSeconds);
 
     hero.innerHTML = `
       <div class="hero-sub60">
@@ -39,8 +50,8 @@
         <div class="hero-gap">
           <span>목표까지</span>
           <div class="hero-gap-value">
-            <strong>${gap}</strong>
-            <em>남음</em>
+            <strong>${gapSeconds > 0 ? gap : "달성권"}</strong>
+            ${gapSeconds > 0 ? "<em>남음</em>" : ""}
           </div>
         </div>
 
@@ -70,6 +81,6 @@
 
   window.renderApp = function () {
     originalRenderApp();
-    applyHeroV103();
+    applyHeroV1031();
   };
 })();
