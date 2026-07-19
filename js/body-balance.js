@@ -56,7 +56,8 @@
     runningPanel.id = "bbRunningPanel";
     runningPanel.className = "bb-panel";
     runningPanel.appendChild(runningNodes);
-    mountNextRunRecommendation(runningPanel);
+    mountRunningCoachCards(runningPanel);
+    compactRecentRuns(runningPanel);
 
     const balancePanel = document.createElement("div");
     balancePanel.id = "bbBalancePanel";
@@ -74,13 +75,42 @@
     refreshBalanceView();
   }
 
-  function mountNextRunRecommendation(runningPanel) {
+  function mountRunningCoachCards(runningPanel) {
     if (!runningPanel || runningPanel.querySelector("#bbNextRunCard")) return;
 
     const hero = runningPanel.querySelector(".hero");
     if (!hero) return;
 
     const recommendation = buildNextRunRecommendation();
+    const briefing = buildTodayBriefing(recommendation);
+    const warning = buildTrainingLoadWarning();
+
+    const briefingCard = document.createElement("section");
+    briefingCard.id = "bbTodayBriefing";
+    briefingCard.className = "card bb-today-briefing";
+    briefingCard.innerHTML = `
+      <span class="bb-next-run-kicker">TODAY</span>
+      <h2>오늘의 한 줄 브리핑</h2>
+      <p>${briefing}</p>
+    `;
+
+    hero.insertAdjacentElement("afterend", briefingCard);
+
+    if (warning) {
+      const warningCard = document.createElement("section");
+      warningCard.id = "bbTrainingWarning";
+      warningCard.className = "card bb-training-warning";
+      warningCard.innerHTML = `
+        <div>
+          <span>TRAINING LOAD</span>
+          <h2>훈련 부담 주의</h2>
+        </div>
+        <p>${warning.message}</p>
+        <small>${warning.note}</small>
+      `;
+      briefingCard.insertAdjacentElement("afterend", warningCard);
+    }
+
     const card = document.createElement("section");
     card.id = "bbNextRunCard";
     card.className = "card bb-next-run-card";
@@ -117,7 +147,111 @@
       <small class="bb-next-run-note">${recommendation.note}</small>
     `;
 
-    hero.insertAdjacentElement("afterend", card);
+    const anchor = document.getElementById("bbTrainingWarning") || briefingCard;
+    anchor.insertAdjacentElement("afterend", card);
+  }
+
+  function buildTodayBriefing(recommendation) {
+    const warning = buildTrainingLoadWarning();
+    if (warning) {
+      return `${recommendation.type} ${recommendation.distance}를 권합니다. 최근 훈련 부담이 올라 강도는 낮추는 편이 좋습니다.`;
+    }
+
+    return `${recommendation.type} ${recommendation.distance}가 좋습니다. ${recommendation.purpose}에 집중하세요.`;
+  }
+
+  function buildTrainingLoadWarning() {
+    const logs = getRecommendationLogs();
+    if (logs.length < 3) return null;
+
+    const now = recommendationStartDay(new Date());
+    const recentStart = new Date(now);
+    recentStart.setDate(now.getDate() - 7);
+    const previousStart = new Date(now);
+    previousStart.setDate(now.getDate() - 14);
+
+    const recentDistance = logs
+      .filter(log => {
+        const date = new Date(log.date);
+        return date >= recentStart && date <= now;
+      })
+      .reduce((sum, log) => sum + Number(log.distance || 0), 0);
+
+    const previousDistance = logs
+      .filter(log => {
+        const date = new Date(log.date);
+        return date >= previousStart && date < recentStart;
+      })
+      .reduce((sum, log) => sum + Number(log.distance || 0), 0);
+
+    if (previousDistance > 0) {
+      const increase = ((recentDistance - previousDistance) / previousDistance) * 100;
+      if (increase >= 30 && recentDistance - previousDistance >= 3) {
+        return {
+          message: `최근 7일 러닝 거리가 이전 7일보다 ${Math.round(increase)}% 증가했습니다.`,
+          note: "다음 러닝은 회복 중심으로 조정했습니다."
+        };
+      }
+    }
+
+    const recentFour = logs.slice(0, 4);
+    const previousFour = logs.slice(4, 8);
+    const recentSummary = summarizeRecommendationLogs(recentFour);
+    const previousSummary = summarizeRecommendationLogs(previousFour);
+
+    if (
+      recentSummary.paceSeconds !== null &&
+      previousSummary.paceSeconds !== null &&
+      recentSummary.paceSeconds - previousSummary.paceSeconds >= 12
+    ) {
+      return {
+        message: "최근 4회 평균 페이스가 이전 기록보다 느려졌습니다.",
+        note: "피로, 날씨, 코스 영향을 확인하고 이번에는 무리하지 마세요."
+      };
+    }
+
+    return null;
+  }
+
+  function compactRecentRuns(runningPanel) {
+    if (!runningPanel) return;
+
+    const sections = [...runningPanel.querySelectorAll("section.card")];
+    const recentSection = sections.find(section =>
+      section.querySelector("h2")?.textContent.trim() === "최근 운동"
+    );
+    if (!recentSection) return;
+
+    const articles = [...recentSection.querySelectorAll(".logs article")];
+    if (articles.length <= 1) return;
+
+    articles.forEach((article, index) => {
+      article.hidden = index > 0;
+    });
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "bb-record-toggle";
+    button.dataset.expanded = "false";
+    button.textContent = `전체 기록 보기 (${articles.length}건)`;
+    button.addEventListener("click", () => {
+      const expanded = button.dataset.expanded === "true";
+      articles.forEach((article, index) => {
+        article.hidden = !expanded && index > 0 ? true : expanded ? index > 0 : false;
+      });
+
+      if (!expanded) {
+        articles.forEach(article => { article.hidden = false; });
+        button.dataset.expanded = "true";
+        button.textContent = "최근 1건만 보기";
+      } else {
+        articles.forEach((article, index) => { article.hidden = index > 0; });
+        button.dataset.expanded = "false";
+        button.textContent = `전체 기록 보기 (${articles.length}건)`;
+      }
+    });
+
+    recentSection.appendChild(button);
   }
 
   function buildNextRunRecommendation() {
@@ -1937,8 +2071,8 @@
 
     list.innerHTML = `
       <div class="bb-record-list">
-        ${records.map(record => `
-          <article class="bb-record">
+        ${records.map((record, index) => `
+          <article class="bb-record" ${index > 0 ? "hidden" : ""}>
             <div class="bb-record-main">
               <b>${formatDate(record.date)}</b>
               <div class="bb-record-values">
@@ -1957,7 +2091,31 @@
           </article>
         `).join("")}
       </div>
+      ${records.length > 1 ? `
+        <button id="bbToggleRecords" class="bb-record-toggle" type="button"
+          data-expanded="false">
+          전체 기록 보기 (${records.length}건)
+        </button>
+      ` : ""}
     `;
+
+    document.getElementById("bbToggleRecords")
+      ?.addEventListener("click", toggleBodyRecords);
+  }
+
+  function toggleBodyRecords(event) {
+    const button = event.currentTarget;
+    const expanded = button.dataset.expanded === "true";
+    const items = [...document.querySelectorAll("#bbRecordList .bb-record")];
+
+    items.forEach((item, index) => {
+      item.hidden = expanded ? index > 0 : false;
+    });
+
+    button.dataset.expanded = String(!expanded);
+    button.textContent = expanded
+      ? `전체 기록 보기 (${items.length}건)`
+      : "최근 1건만 보기";
   }
 
   function drawChart() {
