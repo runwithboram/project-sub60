@@ -56,6 +56,7 @@
     runningPanel.id = "bbRunningPanel";
     runningPanel.className = "bb-panel";
     runningPanel.appendChild(runningNodes);
+    removeLegacyRecordManagement(runningPanel);
     mountRunningCoachCards(runningPanel);
     compactRecentRuns(runningPanel);
 
@@ -73,6 +74,24 @@
     app.append(tabbar, runningPanel, balancePanel, toastElement);
 
     refreshBalanceView();
+  }
+
+  function removeLegacyRecordManagement(runningPanel) {
+    if (!runningPanel) return;
+
+    const headings = [...runningPanel.querySelectorAll("h1, h2, h3")];
+
+    headings
+      .filter(heading => heading.textContent.trim() === "기록 관리")
+      .forEach(heading => {
+        const removable =
+          heading.closest("section") ||
+          heading.closest("article") ||
+          heading.closest(".card") ||
+          heading.parentElement;
+
+        removable?.remove();
+      });
   }
 
   function mountRunningCoachCards(runningPanel) {
