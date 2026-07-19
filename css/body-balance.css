@@ -1050,3 +1050,123 @@
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
 }
+
+
+/* =========================================================
+   v7 D-day based next-run recommendation
+   ========================================================= */
+#bbRunningPanel .bb-next-run-card {
+  background:
+    linear-gradient(145deg, #f7fbf9 0%, #eef6f2 100%) !important;
+  border: 1px solid rgba(49, 93, 79, .14) !important;
+}
+
+#bbRunningPanel .bb-next-run-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-bottom: 15px !important;
+}
+
+#bbRunningPanel .bb-next-run-kicker {
+  display: block !important;
+  margin-bottom: 4px !important;
+  color: #315d4f !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: .1em !important;
+}
+
+#bbRunningPanel .bb-next-run-card h2 {
+  margin: 0 !important;
+  color: #213a32 !important;
+  -webkit-text-fill-color: #213a32 !important;
+  font-size: 20px !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+
+#bbRunningPanel .bb-next-run-header > b {
+  max-width: 48% !important;
+  padding: 7px 10px !important;
+  border-radius: 999px !important;
+  background: #315d4f !important;
+  color: #fff !important;
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+  text-align: right !important;
+}
+
+#bbRunningPanel .bb-next-run-main {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+#bbRunningPanel .bb-next-run-main > div {
+  min-width: 0 !important;
+  padding: 12px 10px !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+}
+
+#bbRunningPanel .bb-next-run-main span,
+#bbRunningPanel .bb-next-run-purpose span {
+  display: block !important;
+  margin-bottom: 5px !important;
+  color: #75817c !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+}
+
+#bbRunningPanel .bb-next-run-main strong {
+  display: block !important;
+  color: #29483d !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  font-weight: 900 !important;
+}
+
+#bbRunningPanel .bb-next-run-purpose {
+  margin-top: 9px !important;
+  padding: 12px !important;
+  border-radius: 14px !important;
+  background: #e6f1ec !important;
+}
+
+#bbRunningPanel .bb-next-run-purpose b {
+  color: #315d4f !important;
+  font-size: 15px !important;
+  background: transparent !important;
+}
+
+#bbRunningPanel .bb-next-run-reason {
+  margin: 13px 0 0 !important;
+  color: #4f5f59 !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+}
+
+#bbRunningPanel .bb-next-run-note {
+  display: block !important;
+  margin-top: 8px !important;
+  color: #7a8782 !important;
+  font-size: 11px !important;
+  line-height: 1.5 !important;
+}
+
+@media (max-width: 520px) {
+  #bbRunningPanel .bb-next-run-main {
+    grid-template-columns: 1fr !important;
+  }
+
+  #bbRunningPanel .bb-next-run-header {
+    flex-direction: column !important;
+  }
+
+  #bbRunningPanel .bb-next-run-header > b {
+    max-width: 100% !important;
+    text-align: left !important;
+  }
+}
