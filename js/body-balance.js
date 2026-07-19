@@ -56,6 +56,7 @@
     runningPanel.id = "bbRunningPanel";
     runningPanel.className = "bb-panel";
     runningPanel.appendChild(runningNodes);
+    mountNextRunRecommendation(runningPanel);
 
     const balancePanel = document.createElement("div");
     balancePanel.id = "bbBalancePanel";
@@ -71,6 +72,263 @@
     app.append(tabbar, runningPanel, balancePanel, toastElement);
 
     refreshBalanceView();
+  }
+
+  function mountNextRunRecommendation(runningPanel) {
+    if (!runningPanel || runningPanel.querySelector("#bbNextRunCard")) return;
+
+    const hero = runningPanel.querySelector(".hero");
+    if (!hero) return;
+
+    const recommendation = buildNextRunRecommendation();
+    const card = document.createElement("section");
+    card.id = "bbNextRunCard";
+    card.className = "card bb-next-run-card";
+    card.innerHTML = `
+      <header class="bb-next-run-header">
+        <div>
+          <span class="bb-next-run-kicker">NEXT RUN</span>
+          <h2>다음 러닝 추천</h2>
+        </div>
+        <b>${recommendation.dday}</b>
+      </header>
+
+      <div class="bb-next-run-main">
+        <div>
+          <span>훈련</span>
+          <strong>${recommendation.type}</strong>
+        </div>
+        <div>
+          <span>거리</span>
+          <strong>${recommendation.distance}</strong>
+        </div>
+        <div>
+          <span>권장 페이스</span>
+          <strong>${recommendation.pace}</strong>
+        </div>
+      </div>
+
+      <div class="bb-next-run-purpose">
+        <span>이번 목표</span>
+        <b>${recommendation.purpose}</b>
+      </div>
+
+      <p class="bb-next-run-reason">${recommendation.reason}</p>
+      <small class="bb-next-run-note">${recommendation.note}</small>
+    `;
+
+    hero.insertAdjacentElement("afterend", card);
+  }
+
+  function buildNextRunRecommendation() {
+    const race = getNearestRecommendationRace();
+    const days = race ? daysUntilRecommendationRace(race.date) : null;
+    const logs = getRecommendationLogs();
+    const body = getBodyTrend(getRecords());
+    const recent = summarizeRecommendationLogs(logs.slice(0, 4));
+    const previous = summarizeRecommendationLogs(logs.slice(4, 8));
+
+    const paceTrend =
+      recent.paceSeconds !== null && previous.paceSeconds !== null
+        ? previous.paceSeconds - recent.paceSeconds
+        : null;
+
+    const mileageJump =
+      previous.distance > 0 &&
+      recent.distance >= previous.distance * 1.25 &&
+      recent.distance - previous.distance >= 3;
+
+    const muscleLoss =
+      body.available &&
+      body.muscleDelta !== null &&
+      body.muscleDelta <= -0.5;
+
+    let recommendation;
+
+    if (days !== null && days <= 2) {
+      recommendation = {
+        type: days === 0 ? "레이스 데이" : "휴식 또는 아주 가벼운 조깅",
+        distance: days === 0 ? "10km" : "2~3km 선택",
+        pace: days === 0 ? "목표 페이스 5'59\"/km" : "말할 수 있을 만큼 편하게",
+        purpose: "컨디션 최우선",
+        reason:
+          `${race.name}까지 ${formatRecommendationDday(days)}입니다. 지금은 체력을 더 만드는 것보다 피로를 남기지 않는 것이 중요합니다.`,
+        note:
+          "통증이나 무거움이 있으면 조깅도 생략하세요."
+      };
+    } else if (days !== null && days <= 7) {
+      recommendation = {
+        type: "짧은 레이스 페이스 적응",
+        distance: "4~5km",
+        pace: "이지 2km + 6'00\"~6'10\"/km 1~2km",
+        purpose: "다리 감각 유지",
+        reason:
+          `${race.name} ${formatRecommendationDday(days)}입니다. 훈련량은 줄이되 목표 페이스 감각만 짧게 확인하는 시기입니다.`,
+        note:
+          "끝까지 힘들게 밀지 말고 여유를 남겨 마치세요."
+      };
+    } else if (muscleLoss || mileageJump) {
+      recommendation = {
+        type: "회복 이지런",
+        distance: "4~5km",
+        pace: "7'25\"~7'50\"/km",
+        purpose: "회복과 근육 보호",
+        reason: muscleLoss
+          ? "최근 골격근량 감소 신호가 있어 강도보다 편안한 움직임과 회복을 우선합니다."
+          : "최근 러닝 거리가 빠르게 늘어 이번 한 회는 훈련 부담을 낮추는 편이 안전합니다.",
+        note:
+          body.available
+            ? "체성분은 보정 요소로만 반영했습니다."
+            : "인바디가 없어도 러닝 기록만으로 추천됩니다."
+      };
+    } else if (days !== null && days <= 21) {
+      recommendation = paceTrend !== null && paceTrend < -8
+        ? {
+            type: "안정적인 이지런",
+            distance: "5~6km",
+            pace: "7'20\"~7'45\"/km",
+            purpose: "피로 조절",
+            reason:
+              `${race.name} ${formatRecommendationDday(days)}이지만 최근 페이스 흐름이 다소 떨어져 이번에는 회복을 먼저 확보합니다.`,
+            note:
+              "다음 훈련에서 컨디션이 회복되면 목표 페이스 구간을 넣으세요."
+          }
+        : {
+            type: "10K 목표 페이스 적응",
+            distance: "6~7km",
+            pace: "이지 2km + 6'05\"~6'15\"/km 3km",
+            purpose: "Sub60 페이스 감각",
+            reason:
+              `${race.name} ${formatRecommendationDday(days)}입니다. 실전 페이스를 길게 버티기보다 짧고 안정적으로 익히는 시기입니다.`,
+            note:
+              "빠른 구간 사이에 2~3분 걷거나 천천히 뛰어도 됩니다."
+          };
+    } else if (days !== null && days <= 49) {
+      recommendation = {
+        type: "지속주",
+        distance: "6~7km",
+        pace: "6'45\"~7'05\"/km",
+        purpose: "지구력과 페이스 안정",
+        reason:
+          `${race.name} ${formatRecommendationDday(days)}입니다. 기반을 유지하면서 Sub60보다 여유 있는 페이스를 오래 끌고 가는 능력을 키울 시기입니다.`,
+        note:
+          recent.count < 2
+            ? "최근 기록이 적어 보수적으로 추천했습니다."
+            : "마지막 1km까지 같은 리듬을 유지하는 것이 목표입니다."
+      };
+    } else {
+      recommendation = {
+        type: "이지런",
+        distance: "5~6km",
+        pace: "7'15\"~7'40\"/km",
+        purpose: "유산소 기반 만들기",
+        reason: race
+          ? `${race.name} ${formatRecommendationDday(days)}입니다. 아직 기반을 쌓는 시기이므로 거리와 꾸준함을 우선합니다.`
+          : "예정된 대회가 없어 최근 러닝 흐름을 기준으로 무리 없는 이지런을 추천합니다.",
+        note:
+          "호흡이 편하고 대화할 수 있는 강도로 달리세요."
+      };
+    }
+
+    if (!logs.length) {
+      recommendation = {
+        type: "가벼운 이지런",
+        distance: "4~5km",
+        pace: "7'30\"~8'00\"/km",
+        purpose: "현재 상태 확인",
+        reason: race
+          ? `${race.name} ${formatRecommendationDday(days)}입니다. 최근 러닝 기록이 없어 첫 회는 편안하게 현재 컨디션을 확인합니다.`
+          : "최근 러닝 기록이 없어 첫 회는 편안하게 현재 컨디션을 확인합니다.",
+        note:
+          "한 번 기록하면 다음 추천부터 실제 페이스 흐름을 반영합니다."
+      };
+    }
+
+    return {
+      ...recommendation,
+      dday: race ? `${formatRecommendationDday(days)} · ${race.name}` : "대회 일정 없음"
+    };
+  }
+
+  function getNearestRecommendationRace() {
+    const races = Array.isArray(window.appData?.races)
+      ? window.appData.races
+      : (typeof appData !== "undefined" && Array.isArray(appData.races)
+          ? appData.races
+          : []);
+
+    const today = recommendationStartDay(new Date());
+
+    return races
+      .map(race => ({
+        ...race,
+        parsedDate: new Date(`${race.date}T00:00:00`)
+      }))
+      .filter(race =>
+        !Number.isNaN(race.parsedDate.getTime()) &&
+        recommendationStartDay(race.parsedDate) >= today
+      )
+      .sort((a, b) => a.parsedDate - b.parsedDate)[0] || null;
+  }
+
+  function daysUntilRecommendationRace(dateString) {
+    const target = recommendationStartDay(
+      new Date(`${dateString}T00:00:00`)
+    );
+    const today = recommendationStartDay(new Date());
+    return Math.max(0, Math.ceil((target - today) / 86400000));
+  }
+
+  function recommendationStartDay(date) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  function formatRecommendationDday(days) {
+    if (days === 0) return "D-DAY";
+    return `D-${days}`;
+  }
+
+  function getRecommendationLogs() {
+    const logs = Array.isArray(window.appData?.logs)
+      ? [...window.appData.logs]
+      : (typeof appData !== "undefined" && Array.isArray(appData.logs)
+          ? [...appData.logs]
+          : []);
+
+    return logs
+      .filter(log =>
+        Number(log.distance) > 0 &&
+        inbodyValidRunTime(log.time)
+      )
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+  }
+
+  function summarizeRecommendationLogs(logs) {
+    if (!logs.length) {
+      return {
+        count: 0,
+        distance: 0,
+        paceSeconds: null
+      };
+    }
+
+    const distance = logs.reduce(
+      (sum, log) => sum + Number(log.distance || 0),
+      0
+    );
+    const seconds = logs.reduce(
+      (sum, log) => sum + inbodyRunSeconds(log.time),
+      0
+    );
+
+    return {
+      count: logs.length,
+      distance,
+      paceSeconds:
+        distance > 0 && seconds > 0
+          ? seconds / distance
+          : null
+    };
   }
 
   function renderBalancePanel() {
