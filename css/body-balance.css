@@ -1170,3 +1170,76 @@
     text-align: left !important;
   }
 }
+
+
+/* =========================================================
+   v8 compact records + daily briefing + load warning
+   ========================================================= */
+#bbRunningPanel .bb-today-briefing,
+#bbRunningPanel .bb-training-warning {
+  padding: 17px !important;
+}
+
+#bbRunningPanel .bb-today-briefing {
+  background: linear-gradient(145deg, #fffdf7 0%, #f7f1e5 100%) !important;
+  border: 1px solid rgba(124, 92, 38, .13) !important;
+}
+
+#bbRunningPanel .bb-today-briefing h2,
+#bbRunningPanel .bb-training-warning h2 {
+  margin: 3px 0 8px !important;
+  color: #213a32 !important;
+  -webkit-text-fill-color: #213a32 !important;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+
+#bbRunningPanel .bb-today-briefing p,
+#bbRunningPanel .bb-training-warning p {
+  margin: 0 !important;
+  color: #495852 !important;
+  font-size: 15px !important;
+  line-height: 1.6 !important;
+  font-weight: 750 !important;
+}
+
+#bbRunningPanel .bb-training-warning {
+  background: #fff2ec !important;
+  border: 1px solid rgba(165, 76, 38, .18) !important;
+}
+
+#bbRunningPanel .bb-training-warning span {
+  color: #a34d28 !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: .08em !important;
+}
+
+#bbRunningPanel .bb-training-warning small {
+  display: block !important;
+  margin-top: 7px !important;
+  color: #8b6656 !important;
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+}
+
+.bb-record-toggle,
+#bbBalancePanel .bb-record-toggle,
+#bbRunningPanel .bb-record-toggle {
+  width: 100% !important;
+  margin-top: 12px !important;
+  padding: 11px 14px !important;
+  border: 0 !important;
+  border-radius: 13px !important;
+  background: #edf3f0 !important;
+  color: #315d4f !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+}
+
+#bbRunningPanel .logs article[hidden],
+#bbBalancePanel .bb-record[hidden] {
+  display: none !important;
+}
