@@ -175,7 +175,7 @@
     item.innerHTML = `
       <div>
         <b>기록 관리</b>
-        <p>러닝과 인바디 전체 기록을 확인하고 수정하거나 삭제합니다.</p>
+        <p>러닝과 인바디 전체 기록을 확인하고 수정·삭제합니다.</p>
       </div>
       <button id="openSub60RecordManager" type="button">열기</button>
     `;
