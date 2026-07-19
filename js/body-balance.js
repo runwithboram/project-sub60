@@ -134,7 +134,7 @@
 
   function enhanceRunningHero(runningPanel) {
     const hero = runningPanel?.querySelector(".hero");
-    if (!hero || hero.querySelector("#bbHeroRecords")) return;
+    if (!hero || hero.querySelector(".hero-sub60") || hero.querySelector("#bbHeroRecords")) return;
 
     const tenK = appData?.records?.tenK || "1:02:17";
     const target = "59:59";
