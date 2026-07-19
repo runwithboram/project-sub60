@@ -97,6 +97,30 @@
       });
   }
 
+  function recommendationTimeToSeconds(value) {
+    const parts = String(value || "")
+      .trim()
+      .split(":")
+      .map(Number);
+
+    if (parts.some(Number.isNaN)) return 0;
+    if (parts.length === 2) return parts[0] * 60 + parts[1];
+    if (parts.length === 3) {
+      return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    }
+    return 0;
+  }
+
+  function recommendationGapText(totalSeconds) {
+    const seconds = Math.max(0, Math.round(Number(totalSeconds) || 0));
+    const minutes = Math.floor(seconds / 60);
+    const remainder = seconds % 60;
+
+    if (minutes && remainder) return `${minutes}분 ${remainder}초`;
+    if (minutes) return `${minutes}분`;
+    return `${remainder}초`;
+  }
+
   function removeLegacyMetrics(runningPanel) {
     if (!runningPanel) return;
 
