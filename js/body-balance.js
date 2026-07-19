@@ -57,6 +57,8 @@
     runningPanel.className = "bb-panel";
     runningPanel.appendChild(runningNodes);
     removeLegacyRecordManagement(runningPanel);
+    removeLegacyMetrics(runningPanel);
+    enhanceRunningHero(runningPanel);
     mountRunningCoachCards(runningPanel);
     compactRecentRuns(runningPanel);
 
@@ -73,6 +75,7 @@
 
     app.append(tabbar, runningPanel, balancePanel, toastElement);
 
+    injectSettingsRecordManagement();
     refreshBalanceView();
   }
 
@@ -94,80 +97,147 @@
       });
   }
 
+  function removeLegacyMetrics(runningPanel) {
+    if (!runningPanel) return;
+
+    runningPanel.querySelectorAll(".metrics").forEach(section => section.remove());
+
+    [...runningPanel.querySelectorAll("section.card")].forEach(section => {
+      const title = section.querySelector("h2")?.textContent.trim();
+      if (title === "Coach") section.remove();
+    });
+  }
+
+  function enhanceRunningHero(runningPanel) {
+    const hero = runningPanel?.querySelector(".hero");
+    if (!hero || hero.querySelector("#bbHeroRecords")) return;
+
+    const tenK = appData?.records?.tenK || "1:02:17";
+    const target = "59:59";
+    const gap = Math.max(
+      0,
+      recommendationTimeToSeconds(tenK) - recommendationTimeToSeconds(target)
+    );
+
+    const records = document.createElement("div");
+    records.id = "bbHeroRecords";
+    records.className = "bb-hero-records";
+    records.innerHTML = `
+      <span><small>10K PB</small><b>${tenK}</b></span>
+      <i aria-hidden="true"></i>
+      <span><small>목표</small><b>${target}</b></span>
+      <i aria-hidden="true"></i>
+      <span class="is-gap">
+        <small>SUB60까지</small>
+        <b>${gap > 0 ? recommendationGapText(gap) : "달성권"}</b>
+      </span>
+    `;
+
+    hero.appendChild(records);
+  }
+
+  function injectSettingsRecordManagement() {
+    const sheet = document.querySelector("#settingsModal .settings-sheet");
+    if (!sheet || sheet.querySelector("#openSub60RecordManager")) return;
+
+    const backupItem =
+      sheet.querySelector(".backup-item") ||
+      [...sheet.querySelectorAll(".settings-item")].find(item =>
+        /백업|복원/.test(item.textContent || "")
+      );
+
+    const item = document.createElement("div");
+    item.className = "settings-item bb-settings-record-item";
+    item.innerHTML = `
+      <div>
+        <b>기록 관리</b>
+        <p>러닝과 인바디 전체 기록을 확인하고 수정하거나 삭제합니다.</p>
+      </div>
+      <button id="openSub60RecordManager" type="button">열기</button>
+    `;
+
+    if (backupItem) backupItem.before(item);
+    else sheet.appendChild(item);
+
+    item.querySelector("#openSub60RecordManager")
+      ?.addEventListener("click", () => {
+        closeSettingsForRecordManager();
+        openRecordManager(getActiveMainTab());
+      });
+  }
+
+  function closeSettingsForRecordManager() {
+    const modal = document.getElementById("settingsModal");
+    const closeButton =
+      modal?.querySelector("[data-close-settings]") ||
+      modal?.querySelector("[data-close]") ||
+      modal?.querySelector(".settings-close");
+
+    if (closeButton) {
+      closeButton.click();
+      return;
+    }
+
+    modal?.classList.remove("is-open", "open", "active");
+    document.body.classList.remove("modal-open", "settings-open");
+  }
+
+  function getActiveMainTab() {
+    return document.querySelector('[data-bb-tab="balance"]')?.classList.contains("is-active")
+      ? "balance"
+      : "running";
+  }
+
   function mountRunningCoachCards(runningPanel) {
-    if (!runningPanel || runningPanel.querySelector("#bbNextRunCard")) return;
+    if (!runningPanel || runningPanel.querySelector("#bbTodayRunCard")) return;
 
     const hero = runningPanel.querySelector(".hero");
     if (!hero) return;
 
     const recommendation = buildNextRunRecommendation();
-    const briefing = buildTodayBriefing(recommendation);
     const warning = buildTrainingLoadWarning();
 
-    const briefingCard = document.createElement("section");
-    briefingCard.id = "bbTodayBriefing";
-    briefingCard.className = "card bb-today-briefing";
-    briefingCard.innerHTML = `
-      <span class="bb-next-run-kicker">TODAY</span>
-      <h2>오늘의 한 줄 브리핑</h2>
-      <p>${briefing}</p>
-    `;
-
-    hero.insertAdjacentElement("afterend", briefingCard);
-
-    if (warning) {
-      const warningCard = document.createElement("section");
-      warningCard.id = "bbTrainingWarning";
-      warningCard.className = "card bb-training-warning";
-      warningCard.innerHTML = `
-        <div>
-          <span>TRAINING LOAD</span>
-          <h2>훈련 부담 주의</h2>
-        </div>
-        <p>${warning.message}</p>
-        <small>${warning.note}</small>
-      `;
-      briefingCard.insertAdjacentElement("afterend", warningCard);
-    }
-
     const card = document.createElement("section");
-    card.id = "bbNextRunCard";
-    card.className = "card bb-next-run-card";
+    card.id = "bbTodayRunCard";
+    card.className = "card bb-today-run-card";
     card.innerHTML = `
-      <header class="bb-next-run-header">
+      <header class="bb-today-run-header">
         <div>
-          <span class="bb-next-run-kicker">NEXT RUN</span>
-          <h2>다음 러닝 추천</h2>
+          <span class="bb-next-run-kicker">TODAY</span>
+          <h2>오늘의 러닝</h2>
         </div>
         <b>${recommendation.dday}</b>
       </header>
 
-      <div class="bb-next-run-main">
+      <div class="bb-today-run-title">
+        <strong>${recommendation.type}</strong>
+        <span>${recommendation.distance}</span>
+      </div>
+
+      <div class="bb-today-run-details">
         <div>
-          <span>훈련</span>
-          <strong>${recommendation.type}</strong>
+          <small>권장 페이스</small>
+          <b>${recommendation.pace}</b>
         </div>
         <div>
-          <span>거리</span>
-          <strong>${recommendation.distance}</strong>
-        </div>
-        <div>
-          <span>권장 페이스</span>
-          <strong>${recommendation.pace}</strong>
+          <small>오늘의 목표</small>
+          <b>${recommendation.purpose}</b>
         </div>
       </div>
 
-      <div class="bb-next-run-purpose">
-        <span>이번 목표</span>
-        <b>${recommendation.purpose}</b>
-      </div>
+      <p class="bb-today-run-reason">${recommendation.reason}</p>
 
-      <p class="bb-next-run-reason">${recommendation.reason}</p>
+      ${warning ? `
+        <div class="bb-today-run-warning">
+          <b>주의</b>
+          <span>${warning.message}</span>
+        </div>
+      ` : ""}
+
       <small class="bb-next-run-note">${recommendation.note}</small>
     `;
 
-    const anchor = document.getElementById("bbTrainingWarning") || briefingCard;
-    anchor.insertAdjacentElement("afterend", card);
+    hero.insertAdjacentElement("afterend", card);
   }
 
   function buildTodayBriefing(recommendation) {
@@ -246,16 +316,6 @@
         article.hidden = index > 0;
       });
     }
-
-    const manageButton = document.createElement("button");
-    manageButton.type = "button";
-    manageButton.className = "bb-manage-button";
-    manageButton.innerHTML = `
-      <span>⚙ 기록 관리</span>
-      <small>전체 러닝 · 인바디 기록 수정 및 삭제</small>
-    `;
-    manageButton.addEventListener("click", () => openRecordManager("running"));
-    runningPanel.appendChild(manageButton);
   }
 
   function buildNextRunRecommendation() {
@@ -635,11 +695,6 @@
           </div>
         </section>
       </section>
-
-      <button id="bbOpenRecordManager" class="bb-manage-button" type="button">
-        <span>⚙ 기록 관리</span>
-        <small>전체 러닝 · 인바디 기록 수정 및 삭제</small>
-      </button>
     `;
   }
 
@@ -659,6 +714,8 @@
   }
 
   function bindBodyBalance() {
+    injectSettingsRecordManagement();
+
     document.querySelectorAll("[data-bb-tab]").forEach(button => {
       button.addEventListener("click", () => switchTab(button.dataset.bbTab));
     });
@@ -683,9 +740,6 @@
 
     document.getElementById("bbGoToInput")
       ?.addEventListener("click", scrollToInputSection);
-
-    document.getElementById("bbOpenRecordManager")
-      ?.addEventListener("click", () => openRecordManager("balance"));
 
     document.getElementById("bbManualOpen")
       ?.addEventListener("click", () => openManualForm());
