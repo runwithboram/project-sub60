@@ -1441,3 +1441,189 @@
     flex: 1 !important;
   }
 }
+
+
+/* =========================================================
+   v10 final compact running home
+   ========================================================= */
+#bbRunningPanel .metrics,
+#bbRunningPanel .bb-manage-button,
+#bbBalancePanel .bb-manage-button,
+#bbTodayBriefing,
+#bbNextRunCard,
+#bbTrainingWarning {
+  display: none !important;
+}
+
+#bbRunningPanel .hero .bb-hero-records {
+  display: grid !important;
+  grid-template-columns: 1fr 1px 1fr 1px 1.15fr !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-top: 18px !important;
+  padding-top: 15px !important;
+  border-top: 1px solid rgba(255, 255, 255, .22) !important;
+}
+
+#bbRunningPanel .hero .bb-hero-records > span {
+  display: flex !important;
+  min-width: 0 !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+}
+
+#bbRunningPanel .hero .bb-hero-records small {
+  color: rgba(255, 255, 255, .7) !important;
+  font-size: 10px !important;
+  font-weight: 750 !important;
+}
+
+#bbRunningPanel .hero .bb-hero-records b {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+#bbRunningPanel .hero .bb-hero-records i {
+  width: 1px !important;
+  height: 28px !important;
+  background: rgba(255, 255, 255, .2) !important;
+}
+
+#bbRunningPanel .bb-today-run-card {
+  padding: 18px !important;
+}
+
+#bbRunningPanel .bb-today-run-header,
+#bbRunningPanel .bb-today-run-details {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+#bbRunningPanel .bb-today-run-header h2 {
+  margin: 3px 0 0 !important;
+  color: #213a32 !important;
+  -webkit-text-fill-color: #213a32 !important;
+  font-size: 20px !important;
+  font-weight: 900 !important;
+}
+
+#bbRunningPanel .bb-today-run-header > b {
+  padding: 6px 9px !important;
+  border-radius: 999px !important;
+  background: #edf3f0 !important;
+  color: #315d4f !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+}
+
+#bbRunningPanel .bb-today-run-title {
+  display: flex !important;
+  align-items: baseline !important;
+  gap: 8px !important;
+  margin-top: 15px !important;
+}
+
+#bbRunningPanel .bb-today-run-title strong {
+  color: #213a32 !important;
+  -webkit-text-fill-color: #213a32 !important;
+  font-size: 24px !important;
+  font-weight: 950 !important;
+}
+
+#bbRunningPanel .bb-today-run-title span {
+  color: #315d4f !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+}
+
+#bbRunningPanel .bb-today-run-details {
+  margin-top: 14px !important;
+  padding: 13px !important;
+  border-radius: 14px !important;
+  background: #f4f8f6 !important;
+}
+
+#bbRunningPanel .bb-today-run-details > div {
+  flex: 1 !important;
+}
+
+#bbRunningPanel .bb-today-run-details small {
+  display: block !important;
+  margin-bottom: 4px !important;
+  color: #748079 !important;
+  font-size: 10px !important;
+  font-weight: 750 !important;
+}
+
+#bbRunningPanel .bb-today-run-details b {
+  color: #29483d !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+}
+
+#bbRunningPanel .bb-today-run-reason {
+  margin: 13px 0 0 !important;
+  color: #59665f !important;
+  font-size: 12px !important;
+  line-height: 1.55 !important;
+}
+
+#bbRunningPanel .bb-today-run-warning {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 7px !important;
+  margin-top: 12px !important;
+  padding: 10px 11px !important;
+  border-radius: 12px !important;
+  background: #fff4ed !important;
+  color: #8e4a2d !important;
+  font-size: 11px !important;
+  line-height: 1.45 !important;
+}
+
+#bbRunningPanel .bb-today-run-warning b {
+  flex: 0 0 auto !important;
+  color: #a34d28 !important;
+}
+
+#bbRunningPanel .bb-next-run-note {
+  display: block !important;
+  margin-top: 10px !important;
+  color: #849089 !important;
+  font-size: 10px !important;
+  line-height: 1.45 !important;
+}
+
+#settingsModal .bb-settings-record-item {
+  align-items: center !important;
+}
+
+#settingsModal .bb-settings-record-item > button {
+  flex: 0 0 auto !important;
+  padding: 9px 13px !important;
+  border: 0 !important;
+  border-radius: 11px !important;
+  background: #e8f0ec !important;
+  color: #315d4f !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+}
+
+@media (max-width: 380px) {
+  #bbRunningPanel .hero .bb-hero-records {
+    gap: 7px !important;
+  }
+
+  #bbRunningPanel .hero .bb-hero-records b {
+    font-size: 12px !important;
+  }
+
+  #bbRunningPanel .bb-today-run-details {
+    flex-direction: column !important;
+  }
+}
