@@ -220,38 +220,23 @@
     const recentSection = sections.find(section =>
       section.querySelector("h2")?.textContent.trim() === "최근 운동"
     );
-    if (!recentSection) return;
 
-    const articles = [...recentSection.querySelectorAll(".logs article")];
-    if (articles.length <= 1) return;
-
-    articles.forEach((article, index) => {
-      article.hidden = index > 0;
-    });
-
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "bb-record-toggle";
-    button.dataset.expanded = "false";
-    button.textContent = `전체 기록 보기 (${articles.length}건)`;
-    button.addEventListener("click", () => {
-      const expanded = button.dataset.expanded === "true";
+    if (recentSection) {
+      const articles = [...recentSection.querySelectorAll(".logs article")];
       articles.forEach((article, index) => {
-        article.hidden = !expanded && index > 0 ? true : expanded ? index > 0 : false;
+        article.hidden = index > 0;
       });
+    }
 
-      if (!expanded) {
-        articles.forEach(article => { article.hidden = false; });
-        button.dataset.expanded = "true";
-        button.textContent = "최근 1건만 보기";
-      } else {
-        articles.forEach((article, index) => { article.hidden = index > 0; });
-        button.dataset.expanded = "false";
-        button.textContent = `전체 기록 보기 (${articles.length}건)`;
-      }
-    });
-
-    recentSection.appendChild(button);
+    const manageButton = document.createElement("button");
+    manageButton.type = "button";
+    manageButton.className = "bb-manage-button";
+    manageButton.innerHTML = `
+      <span>⚙ 기록 관리</span>
+      <small>전체 러닝 · 인바디 기록 수정 및 삭제</small>
+    `;
+    manageButton.addEventListener("click", () => openRecordManager("running"));
+    runningPanel.appendChild(manageButton);
   }
 
   function buildNextRunRecommendation() {
@@ -631,6 +616,11 @@
           </div>
         </section>
       </section>
+
+      <button id="bbOpenRecordManager" class="bb-manage-button" type="button">
+        <span>⚙ 기록 관리</span>
+        <small>전체 러닝 · 인바디 기록 수정 및 삭제</small>
+      </button>
     `;
   }
 
@@ -675,6 +665,9 @@
     document.getElementById("bbGoToInput")
       ?.addEventListener("click", scrollToInputSection);
 
+    document.getElementById("bbOpenRecordManager")
+      ?.addEventListener("click", () => openRecordManager("balance"));
+
     document.getElementById("bbManualOpen")
       ?.addEventListener("click", () => openManualForm());
 
@@ -706,6 +699,311 @@
         target.classList.remove("is-highlighted");
       }, 1400);
     });
+  }
+
+  function openRecordManager(returnTab = "running") {
+    const app = document.getElementById("app");
+    const tabbar = document.getElementById("bbTabbar");
+    const running = document.getElementById("bbRunningPanel");
+    const balance = document.getElementById("bbBalancePanel");
+    if (!app || !tabbar || !running || !balance) return;
+
+    document.getElementById("bbRecordManager")?.remove();
+
+    tabbar.hidden = true;
+    running.hidden = true;
+    balance.hidden = true;
+
+    const manager = document.createElement("section");
+    manager.id = "bbRecordManager";
+    manager.className = "bb-record-manager";
+    manager.dataset.returnTab = returnTab;
+    manager.innerHTML = renderRecordManager();
+
+    app.appendChild(manager);
+    bindRecordManager();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function closeRecordManager() {
+    const manager = document.getElementById("bbRecordManager");
+    const returnTab = manager?.dataset.returnTab || "running";
+    manager?.remove();
+
+    const tabbar = document.getElementById("bbTabbar");
+    if (tabbar) tabbar.hidden = false;
+    switchTab(returnTab);
+  }
+
+  function renderRecordManager() {
+    const runningLogs = getManagerRunningLogs();
+    const bodyRecords = getRecords().slice().reverse();
+
+    return `
+      <header class="bb-manager-header">
+        <button id="bbManagerBack" type="button" aria-label="뒤로 가기">←</button>
+        <div>
+          <small>SETTINGS</small>
+          <h1>기록 관리</h1>
+          <p>전체 기록을 확인하고 수정하거나 삭제합니다.</p>
+        </div>
+      </header>
+
+      <section class="bb-manager-card">
+        <div class="bb-manager-title">
+          <h2>러닝 기록</h2>
+          <span>${runningLogs.length}건</span>
+        </div>
+        <div class="bb-manager-list">
+          ${runningLogs.length ? runningLogs.map(log => `
+            <article class="bb-manager-item">
+              <div>
+                <b>${managerDate(log.date)}</b>
+                <p>${Number(log.distance).toFixed(2)}km · ${log.time} · ${log.pace || managerPace(log.distance, log.time)}</p>
+              </div>
+              <div class="bb-manager-actions">
+                <button type="button" data-manager-action="edit-run" data-id="${log.id}">수정</button>
+                <button type="button" data-manager-action="delete-run" data-id="${log.id}">삭제</button>
+              </div>
+            </article>
+          `).join("") : `<p class="bb-empty">저장된 러닝 기록이 없습니다.</p>`}
+        </div>
+      </section>
+
+      <section class="bb-manager-card">
+        <div class="bb-manager-title">
+          <h2>인바디 기록</h2>
+          <span>${bodyRecords.length}건</span>
+        </div>
+        <div class="bb-manager-list">
+          ${bodyRecords.length ? bodyRecords.map(record => `
+            <article class="bb-manager-item">
+              <div>
+                <b>${formatDate(record.date)}</b>
+                <p>
+                  체중 ${displayUnit(record.weight, "kg")} ·
+                  골격근 ${displayUnit(record.muscle, "kg")} ·
+                  체지방량 ${displayUnit(record.fatMass, "kg")}
+                </p>
+              </div>
+              <div class="bb-manager-actions">
+                <button type="button" data-manager-action="edit-body" data-date="${record.date}">수정</button>
+                <button type="button" data-manager-action="delete-body" data-date="${record.date}">삭제</button>
+              </div>
+            </article>
+          `).join("") : `<p class="bb-empty">저장된 인바디 기록이 없습니다.</p>`}
+        </div>
+      </section>
+
+      <section class="bb-manager-card bb-manager-danger">
+        <div class="bb-manager-title">
+          <h2>데이터 관리</h2>
+        </div>
+        <button id="bbClearAllData" class="bb-clear-data" type="button">
+          모든 기록 초기화
+        </button>
+        <small>러닝과 인바디 기록이 모두 삭제되며 되돌릴 수 없습니다.</small>
+      </section>
+    `;
+  }
+
+  function bindRecordManager() {
+    document.getElementById("bbManagerBack")
+      ?.addEventListener("click", closeRecordManager);
+
+    document.getElementById("bbRecordManager")
+      ?.addEventListener("click", handleManagerAction);
+
+    document.getElementById("bbClearAllData")
+      ?.addEventListener("click", clearAllRecords);
+  }
+
+  function handleManagerAction(event) {
+    const button = event.target.closest("[data-manager-action]");
+    if (!button) return;
+
+    const action = button.dataset.managerAction;
+
+    if (action === "delete-run") deleteManagerRun(button.dataset.id);
+    if (action === "edit-run") editManagerRun(button.dataset.id);
+    if (action === "delete-body") deleteManagerBody(button.dataset.date);
+    if (action === "edit-body") editManagerBody(button.dataset.date);
+  }
+
+  function getManagerRunningLogs() {
+    const logs = Array.isArray(window.appData?.logs)
+      ? [...window.appData.logs]
+      : (typeof appData !== "undefined" && Array.isArray(appData.logs)
+          ? [...appData.logs]
+          : []);
+
+    return logs.sort((a, b) => new Date(b.date) - new Date(a.date));
+  }
+
+  function deleteManagerRun(id) {
+    const targetId = String(id);
+    const logs = getManagerRunningLogs();
+    const target = logs.find(log => String(log.id) === targetId);
+    if (!target) return;
+
+    if (!confirm(`${managerDate(target.date)} 러닝 기록을 삭제할까요?`)) return;
+
+    const remaining = logs.filter(log => String(log.id) !== targetId);
+    if (typeof appData !== "undefined") {
+      appData.logs = remaining;
+      recalculateManagerWeek();
+      localStorage.setItem("roadToSub60_v1", JSON.stringify(appData));
+    }
+
+    reopenManager();
+  }
+
+  function editManagerRun(id) {
+    const logs = getManagerRunningLogs();
+    const target = logs.find(log => String(log.id) === String(id));
+    if (!target) return;
+
+    const distanceInput = prompt("거리(km)를 입력하세요.", target.distance);
+    if (distanceInput === null) return;
+    const distance = Number(distanceInput);
+    if (!Number.isFinite(distance) || distance <= 0) {
+      alert("올바른 거리를 입력해 주세요.");
+      return;
+    }
+
+    const timeInput = prompt("시간을 입력하세요. 예: 1:02:17", target.time);
+    if (timeInput === null) return;
+    if (!inbodyValidRunTime(timeInput)) {
+      alert("시간 형식이 올바르지 않습니다.");
+      return;
+    }
+
+    target.distance = Math.round(distance * 100) / 100;
+    target.time = timeInput;
+    target.pace = managerPace(target.distance, target.time);
+
+    if (typeof appData !== "undefined") {
+      appData.logs = logs;
+      recalculateManagerWeek();
+      localStorage.setItem("roadToSub60_v1", JSON.stringify(appData));
+    }
+
+    reopenManager();
+  }
+
+  function deleteManagerBody(date) {
+    const records = getRecords();
+    const target = records.find(record => record.date === date);
+    if (!target) return;
+
+    if (!confirm(`${formatDate(date)} 인바디 기록을 삭제할까요?`)) return;
+    saveRecords(records.filter(record => record.date !== date));
+    reopenManager();
+  }
+
+  function editManagerBody(date) {
+    const records = getRecords();
+    const target = records.find(record => record.date === date);
+    if (!target) return;
+
+    const weight = managerPromptNumber("체중(kg)", target.weight);
+    if (weight === undefined) return;
+    const muscle = managerPromptNumber("골격근량(kg)", target.muscle);
+    if (muscle === undefined) return;
+    const fatMass = managerPromptNumber("체지방량(kg)", target.fatMass);
+    if (fatMass === undefined) return;
+    const fatRate = managerPromptNumber(
+      "체지방률(%)",
+      target.fatRate ?? (weight && fatMass ? fatMass / weight * 100 : null)
+    );
+    if (fatRate === undefined) return;
+
+    Object.assign(target, {
+      weight,
+      muscle,
+      fatMass,
+      fatRate
+    });
+    saveRecords(records);
+    reopenManager();
+  }
+
+  function managerPromptNumber(label, value) {
+    const input = prompt(label, value ?? "");
+    if (input === null) return undefined;
+    if (input.trim() === "") return null;
+
+    const number = Number(input);
+    if (!Number.isFinite(number) || number < 0) {
+      alert(`${label} 값을 확인해 주세요.`);
+      return undefined;
+    }
+    return Math.round(number * 10) / 10;
+  }
+
+  function clearAllRecords() {
+    if (!confirm("러닝과 인바디 기록을 모두 초기화할까요?")) return;
+    if (!confirm("정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) return;
+
+    localStorage.removeItem("sub60-body-balance-v1");
+
+    if (typeof appData !== "undefined") {
+      appData.logs = [];
+      appData.weekly.current = 0;
+      localStorage.setItem("roadToSub60_v1", JSON.stringify(appData));
+    }
+
+    reopenManager();
+  }
+
+  function reopenManager() {
+    const manager = document.getElementById("bbRecordManager");
+    const returnTab = manager?.dataset.returnTab || "running";
+    manager?.remove();
+    openRecordManager(returnTab);
+  }
+
+  function managerDate(date) {
+    const value = new Date(date);
+    if (Number.isNaN(value.getTime())) return String(date || "");
+    return value.toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    });
+  }
+
+  function managerPace(distance, time) {
+    const seconds = inbodyRunSeconds(time);
+    if (!distance || !seconds) return "-";
+
+    const paceSeconds = Math.round(seconds / Number(distance));
+    const minutes = Math.floor(paceSeconds / 60);
+    const secondsPart = String(paceSeconds % 60).padStart(2, "0");
+    return `${minutes}'${secondsPart}"/km`;
+  }
+
+  function recalculateManagerWeek() {
+    if (typeof appData === "undefined") return;
+
+    const now = new Date();
+    const day = now.getDay();
+    const offset = day === 0 ? -6 : 1 - day;
+    const start = new Date(now);
+    start.setDate(now.getDate() + offset);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(start);
+    end.setDate(start.getDate() + 7);
+
+    appData.weekly.current = Math.round(
+      appData.logs
+        .filter(log => {
+          const date = new Date(log.date);
+          return date >= start && date < end;
+        })
+        .reduce((sum, log) => sum + Number(log.distance || 0), 0) * 100
+    ) / 100;
   }
 
   function switchTab(tab) {
@@ -2069,53 +2367,22 @@
       return;
     }
 
+    const record = records[0];
     list.innerHTML = `
       <div class="bb-record-list">
-        ${records.map((record, index) => `
-          <article class="bb-record" ${index > 0 ? "hidden" : ""}>
-            <div class="bb-record-main">
-              <b>${formatDate(record.date)}</b>
-              <div class="bb-record-values">
-                <span>체중 ${displayUnit(record.weight, "kg")}</span>
-                <span>골격근 ${displayUnit(record.muscle, "kg")}</span>
-                <span>체지방량 ${displayUnit(record.fatMass, "kg")}</span>
-                <span>체지방률 ${displayUnit(record.fatRate, "%")}</span>
-              </div>
+        <article class="bb-record">
+          <div class="bb-record-main">
+            <b>${formatDate(record.date)}</b>
+            <div class="bb-record-values">
+              <span>체중 ${displayUnit(record.weight, "kg")}</span>
+              <span>골격근 ${displayUnit(record.muscle, "kg")}</span>
+              <span>체지방량 ${displayUnit(record.fatMass, "kg")}</span>
+              <span>체지방률 ${displayUnit(record.fatRate, "%")}</span>
             </div>
-            <div class="bb-record-actions">
-              <button class="bb-icon-button" type="button"
-                data-bb-action="edit" data-date="${record.date}" aria-label="수정">수정</button>
-              <button class="bb-icon-button" type="button"
-                data-bb-action="delete" data-date="${record.date}" aria-label="삭제">삭제</button>
-            </div>
-          </article>
-        `).join("")}
+          </div>
+        </article>
       </div>
-      ${records.length > 1 ? `
-        <button id="bbToggleRecords" class="bb-record-toggle" type="button"
-          data-expanded="false">
-          전체 기록 보기 (${records.length}건)
-        </button>
-      ` : ""}
     `;
-
-    document.getElementById("bbToggleRecords")
-      ?.addEventListener("click", toggleBodyRecords);
-  }
-
-  function toggleBodyRecords(event) {
-    const button = event.currentTarget;
-    const expanded = button.dataset.expanded === "true";
-    const items = [...document.querySelectorAll("#bbRecordList .bb-record")];
-
-    items.forEach((item, index) => {
-      item.hidden = expanded ? index > 0 : false;
-    });
-
-    button.dataset.expanded = String(!expanded);
-    button.textContent = expanded
-      ? `전체 기록 보기 (${items.length}건)`
-      : "최근 1건만 보기";
   }
 
   function drawChart() {
