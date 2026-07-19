@@ -1243,3 +1243,201 @@
 #bbBalancePanel .bb-record[hidden] {
   display: none !important;
 }
+
+
+/* =========================================================
+   v9 separate record manager
+   ========================================================= */
+.bb-manage-button,
+#bbRunningPanel .bb-manage-button,
+#bbBalancePanel .bb-manage-button {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-top: 16px !important;
+  padding: 14px 16px !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: #edf3f0 !important;
+  color: #315d4f !important;
+  cursor: pointer !important;
+}
+
+.bb-manage-button span {
+  font-size: 14px !important;
+  font-weight: 900 !important;
+}
+
+.bb-manage-button small {
+  color: #6c7a74 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+}
+
+#bbRecordManager {
+  width: 100% !important;
+}
+
+#bbRecordManager .bb-manager-header {
+  display: flex !important;
+  gap: 13px !important;
+  align-items: flex-start !important;
+  padding: 8px 0 18px !important;
+}
+
+#bbRecordManager .bb-manager-header > button {
+  width: 40px !important;
+  height: 40px !important;
+  flex: 0 0 40px !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: #edf3f0 !important;
+  color: #315d4f !important;
+  font-size: 20px !important;
+  font-weight: 900 !important;
+}
+
+#bbRecordManager .bb-manager-header small {
+  color: #315d4f !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: .1em !important;
+}
+
+#bbRecordManager .bb-manager-header h1 {
+  margin: 3px 0 5px !important;
+  color: #213a32 !important;
+  -webkit-text-fill-color: #213a32 !important;
+  font-size: 27px !important;
+  font-weight: 900 !important;
+}
+
+#bbRecordManager .bb-manager-header p {
+  margin: 0 !important;
+  color: #68756f !important;
+  font-size: 13px !important;
+}
+
+#bbRecordManager .bb-manager-card {
+  margin-bottom: 16px !important;
+  padding: 17px !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  box-shadow: 0 8px 24px rgba(34, 56, 48, .07) !important;
+}
+
+#bbRecordManager .bb-manager-title {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  margin-bottom: 12px !important;
+}
+
+#bbRecordManager .bb-manager-title h2 {
+  margin: 0 !important;
+  color: #213a32 !important;
+  -webkit-text-fill-color: #213a32 !important;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+}
+
+#bbRecordManager .bb-manager-title span {
+  color: #6b7872 !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+
+#bbRecordManager .bb-manager-list {
+  display: grid !important;
+  gap: 9px !important;
+}
+
+#bbRecordManager .bb-manager-item {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 12px !important;
+  border-radius: 14px !important;
+  background: #f7faf8 !important;
+}
+
+#bbRecordManager .bb-manager-item b {
+  color: #29483d !important;
+  font-size: 13px !important;
+  background: transparent !important;
+}
+
+#bbRecordManager .bb-manager-item p {
+  margin: 4px 0 0 !important;
+  color: #6a7771 !important;
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+}
+
+#bbRecordManager .bb-manager-actions {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  gap: 6px !important;
+}
+
+#bbRecordManager .bb-manager-actions button {
+  padding: 7px 9px !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: #e8f0ec !important;
+  color: #315d4f !important;
+  font-size: 11px !important;
+  font-weight: 850 !important;
+}
+
+#bbRecordManager .bb-manager-actions button:last-child {
+  background: #fff0ea !important;
+  color: #a34d28 !important;
+}
+
+#bbRecordManager .bb-manager-danger {
+  border: 1px solid rgba(163, 77, 40, .15) !important;
+}
+
+#bbRecordManager .bb-clear-data {
+  width: 100% !important;
+  padding: 12px !important;
+  border: 0 !important;
+  border-radius: 13px !important;
+  background: #fff0ea !important;
+  color: #a34d28 !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+}
+
+#bbRecordManager .bb-manager-danger small {
+  display: block !important;
+  margin-top: 8px !important;
+  color: #8a6a5d !important;
+  font-size: 11px !important;
+  line-height: 1.5 !important;
+}
+
+@media (max-width: 520px) {
+  .bb-manage-button {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+  }
+
+  #bbRecordManager .bb-manager-item {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+  }
+
+  #bbRecordManager .bb-manager-actions {
+    width: 100% !important;
+  }
+
+  #bbRecordManager .bb-manager-actions button {
+    flex: 1 !important;
+  }
+}
