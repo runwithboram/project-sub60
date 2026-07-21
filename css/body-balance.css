@@ -1907,3 +1907,100 @@
     text-align: left !important;
   }
 }
+
+
+/* =========================================================
+   v10.6 information architecture cleanup
+   ========================================================= */
+#bbRunningPanel .bb-milestone-panel {
+  padding: 16px !important;
+  border: 1px solid rgba(82, 119, 102, .13) !important;
+  border-radius: 17px !important;
+  background: linear-gradient(145deg, #f8fbf9 0%, #eef5f1 100%) !important;
+}
+
+#bbRunningPanel .bb-milestone-head {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+}
+
+#bbRunningPanel .bb-milestone-head span {
+  display: block !important;
+  margin-bottom: 4px !important;
+  color: #73817b !important;
+  -webkit-text-fill-color: #73817b !important;
+  font-size: 9px !important;
+  font-weight: 900 !important;
+  letter-spacing: .08em !important;
+}
+
+#bbRunningPanel .bb-milestone-head b {
+  color: #1f3d33 !important;
+  -webkit-text-fill-color: #1f3d33 !important;
+  font-size: 25px !important;
+  font-weight: 950 !important;
+  letter-spacing: -.03em !important;
+}
+
+#bbRunningPanel .bb-milestone-head strong {
+  padding: 6px 9px !important;
+  border-radius: 999px !important;
+  background: rgba(47, 119, 85, .10) !important;
+  color: #2f7755 !important;
+  -webkit-text-fill-color: #2f7755 !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+}
+
+#bbRunningPanel .bb-milestone-panel p {
+  margin: 9px 0 0 !important;
+  color: #5e6c66 !important;
+  -webkit-text-fill-color: #5e6c66 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1.5 !important;
+}
+
+#bbRunningPanel .bb-coach-why {
+  display: block !important;
+  padding: 14px !important;
+}
+
+#bbRunningPanel .bb-coach-why > div {
+  display: block !important;
+  margin-bottom: 8px !important;
+}
+
+#bbRunningPanel .bb-coach-why > div span {
+  display: block !important;
+  margin-bottom: 3px !important;
+}
+
+#bbRunningPanel .bb-coach-why > div b {
+  font-size: 15px !important;
+}
+
+#bbRunningPanel .bb-coach-why p {
+  margin: 0 !important;
+  font-size: 12px !important;
+  line-height: 1.55 !important;
+}
+
+#bbRunningPanel .bb-coach-why small {
+  display: block !important;
+  margin-top: 8px !important;
+  opacity: .72 !important;
+  line-height: 1.45 !important;
+}
+
+#bbRunningPanel .weekly-report-grid > div:first-child b {
+  font-size: 14px !important;
+}
+
+@media (max-width: 380px) {
+  #bbRunningPanel .bb-milestone-head b {
+    font-size: 22px !important;
+  }
+}
