@@ -2,6 +2,7 @@
   "use strict";
 
   const STORAGE_KEY = "sub60-body-balance-v1";
+  const PERSONALIZATION_KEY = "sub60-running-personalization-v1";
   let pendingRows = [];
   let editingDate = null;
   let selectedInbodyFile = null;
@@ -61,6 +62,7 @@
     enhanceRunningHero(runningPanel);
     mountRunningCoachCards(runningPanel);
     compactRecentRuns(runningPanel);
+    decorateLatestRunAssessment(runningPanel);
 
     const balancePanel = document.createElement("div");
     balancePanel.id = "bbBalancePanel";
@@ -219,6 +221,9 @@
     if (!hero) return;
 
     const recommendation = buildNextRunRecommendation();
+    const snapshot = saveTodayRecommendationSnapshot(recommendation);
+    evaluateRecommendationHistory();
+    const learning = getPersonalizationSummary();
     const warning = buildTrainingLoadWarning();
 
     const card = document.createElement("section");
@@ -266,6 +271,11 @@
       ` : ""}
 
       <small class="bb-next-run-note">${recommendation.note}</small>
+
+      <div class="bb-learning-status">
+        <span>${learning.ready ? "개인화 적용 중" : `개인화 학습 ${learning.count}/6`}</span>
+        <b>${learning.message}</b>
+      </div>
     `;
 
     hero.insertAdjacentElement("afterend", card);
@@ -562,6 +572,8 @@
       };
     }
 
+    recommendation = applySafePersonalization(recommendation, logs);
+
     return {
       ...recommendation,
       signal,
@@ -649,6 +661,266 @@
     }
 
     return parts.join(" · ") + comparison;
+  }
+
+  function getPersonalizationStore() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(PERSONALIZATION_KEY) || "{}");
+      return {
+        snapshots: parsed && typeof parsed.snapshots === "object" ? parsed.snapshots : {},
+        assessments: parsed && typeof parsed.assessments === "object" ? parsed.assessments : {}
+      };
+    } catch {
+      return { snapshots: {}, assessments: {} };
+    }
+  }
+
+  function savePersonalizationStore(store) {
+    localStorage.setItem(PERSONALIZATION_KEY, JSON.stringify(store));
+  }
+
+  function recommendationDateKey(value = new Date()) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  function saveTodayRecommendationSnapshot(recommendation) {
+    const store = getPersonalizationStore();
+    const key = recommendationDateKey();
+    if (!key) return null;
+
+    if (!store.snapshots[key]) {
+      const sameDayRunExists = getRecommendationLogs()
+        .some(log => recommendationDateKey(log.date) === key);
+
+      store.snapshots[key] = {
+        date: key,
+        type: recommendation.type,
+        distance: recommendation.distance,
+        pace: recommendation.pace,
+        purpose: recommendation.purpose,
+        createdAt: new Date().toISOString(),
+        comparable: !sameDayRunExists
+      };
+      savePersonalizationStore(store);
+    }
+
+    return store.snapshots[key];
+  }
+
+  function evaluateRecommendationHistory() {
+    const store = getPersonalizationStore();
+    const logs = getRecommendationLogs();
+    let changed = false;
+
+    Object.values(store.snapshots).forEach(snapshot => {
+      if (!snapshot?.date || snapshot.comparable === false || store.assessments[snapshot.date]) return;
+
+      const run = logs.find(log => recommendationDateKey(log.date) === snapshot.date);
+      if (!run) return;
+
+      store.assessments[snapshot.date] = assessRunAgainstRecommendation(snapshot, run);
+      changed = true;
+    });
+
+    if (changed) savePersonalizationStore(store);
+  }
+
+  function assessRunAgainstRecommendation(snapshot, run) {
+    const actualDistance = Number(run.distance || 0);
+    const actualPace = recommendationLogPaceSeconds(run);
+    const distanceRange = parseRecommendationDistance(snapshot.distance);
+    const paceRange = parseRecommendationPace(snapshot.pace);
+
+    const distanceInside =
+      distanceRange &&
+      actualDistance >= distanceRange.min - 0.25 &&
+      actualDistance <= distanceRange.max + 0.35;
+
+    const distanceShort =
+      distanceRange && actualDistance < distanceRange.min - 0.25;
+
+    const distanceLong =
+      distanceRange && actualDistance > distanceRange.max + 0.35;
+
+    const paceInside =
+      paceRange &&
+      actualPace !== null &&
+      actualPace >= paceRange.min - 12 &&
+      actualPace <= paceRange.max + 12;
+
+    const paceTooFast =
+      paceRange && actualPace !== null && actualPace < paceRange.min - 12;
+
+    const paceTooSlow =
+      paceRange && actualPace !== null && actualPace > paceRange.max + 12;
+
+    let status = "different";
+    let label = "다른 훈련 수행";
+    let reason = "추천 범위와 다른 형태의 러닝으로 기록되었습니다.";
+    let confidence = "보통";
+
+    if (distanceInside && paceInside) {
+      status = "matched";
+      label = "추천 잘 수행";
+      reason = "권장 거리와 페이스 범위에 모두 들어왔습니다.";
+      confidence = "높음";
+    } else if (distanceInside && paceTooFast) {
+      status = "too_hard";
+      label = "예정보다 강하게 수행";
+      reason = `거리는 적절했지만 권장 페이스보다 약 ${Math.max(1, Math.round(paceRange.min - actualPace))}초/km 빠르게 뛰었습니다.`;
+      confidence = "높음";
+    } else if (distanceLong && (paceInside || paceTooFast)) {
+      status = "too_hard";
+      label = "거리·강도 초과";
+      reason = `권장 상한보다 약 ${Math.max(0.1, actualDistance - distanceRange.max).toFixed(1)}km 더 달렸습니다.`;
+      confidence = "높음";
+    } else if (distanceShort && (paceInside || paceTooSlow)) {
+      status = "partial";
+      label = "거리만 짧게 수행";
+      reason = `권장 하한보다 약 ${Math.max(0.1, distanceRange.min - actualDistance).toFixed(1)}km 짧게 마쳤습니다.`;
+      confidence = "높음";
+    } else if (distanceInside && paceTooSlow) {
+      status = "partial";
+      label = "회복 강도로 수행";
+      reason = "권장 거리는 채웠지만 페이스는 더 편안하게 진행했습니다.";
+      confidence = "높음";
+    } else if (!paceRange && distanceInside) {
+      status = "matched";
+      label = "추천 거리 수행";
+      reason = "페이스 비교가 어려운 추천이지만 권장 거리는 수행했습니다.";
+      confidence = "보통";
+    }
+
+    return {
+      date: snapshot.date,
+      runId: String(run.id || ""),
+      status,
+      label,
+      reason,
+      confidence,
+      recommendedType: snapshot.type,
+      actualDistance,
+      actualPace,
+      assessedAt: new Date().toISOString()
+    };
+  }
+
+  function parseRecommendationDistance(value) {
+    const text = String(value || "").replace(/,/g, ".");
+    const range = text.match(/(\d+(?:\.\d+)?)\s*[~～-]\s*(\d+(?:\.\d+)?)\s*km/i);
+    if (range) return { min: Number(range[1]), max: Number(range[2]) };
+
+    const single = text.match(/(\d+(?:\.\d+)?)\s*km/i);
+    if (single) {
+      const number = Number(single[1]);
+      return { min: Math.max(0, number - 0.5), max: number + 0.5 };
+    }
+
+    return null;
+  }
+
+  function parseRecommendationPace(value) {
+    const matches = [...String(value || "").matchAll(/(\d+)'(\d{1,2})"/g)]
+      .map(match => Number(match[1]) * 60 + Number(match[2]))
+      .filter(Number.isFinite);
+
+    if (!matches.length) return null;
+    if (matches.length === 1) {
+      return { min: matches[0] - 10, max: matches[0] + 10 };
+    }
+
+    const sorted = matches.sort((a, b) => a - b);
+    return { min: sorted[0], max: sorted[sorted.length - 1] };
+  }
+
+  function getPersonalizationSummary() {
+    const store = getPersonalizationStore();
+    const assessments = Object.values(store.assessments)
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+    const count = assessments.length;
+
+    if (count < 6) {
+      return {
+        count,
+        ready: false,
+        message: count
+          ? "기록이 더 쌓이면 거리와 강도를 자동 보정합니다."
+          : "오늘 추천부터 자동으로 학습을 시작합니다."
+      };
+    }
+
+    const recent = assessments.slice(0, 10);
+    const matched = recent.filter(item => item.status === "matched").length;
+    const tooHard = recent.filter(item => item.status === "too_hard").length;
+    const partial = recent.filter(item => item.status === "partial").length;
+
+    let message = `최근 ${recent.length}회 중 추천 일치 ${matched}회`;
+    if (tooHard >= 3) message = "예정보다 강하게 뛰는 경향을 다음 추천에 반영했습니다.";
+    else if (partial >= 3) message = "완료 가능한 거리부터 안정적으로 늘리도록 조정했습니다.";
+    else if (matched >= Math.ceil(recent.length * 0.6)) message = "현재 추천 강도가 보람 님에게 잘 맞고 있습니다.";
+
+    return { count, ready: true, message };
+  }
+
+  function applySafePersonalization(recommendation, logs) {
+    const summary = getPersonalizationSummary();
+    if (!summary.ready) return recommendation;
+
+    const store = getPersonalizationStore();
+    const recent = Object.values(store.assessments)
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, 10);
+
+    const tooHard = recent.filter(item => item.status === "too_hard").length;
+    const partial = recent.filter(item => item.status === "partial").length;
+    const matched = recent.filter(item => item.status === "matched").length;
+
+    const adjusted = { ...recommendation };
+
+    if (tooHard >= 3 && !/휴식|회복|레이스/.test(adjusted.type)) {
+      adjusted.note = `${adjusted.note} 최근 예정보다 강하게 뛰는 경향이 있어 상한 페이스를 넘기지 마세요.`;
+      adjusted.purpose = "강도 조절과 " + adjusted.purpose;
+    } else if (partial >= 3) {
+      const range = parseRecommendationDistance(adjusted.distance);
+      if (range && range.min >= 5) {
+        const newMin = Math.max(3, range.min - 1);
+        const newMax = Math.max(newMin + 1, range.max - 1);
+        adjusted.distance = `${newMin}~${newMax}km`;
+        adjusted.reason = `${adjusted.reason} 최근 완료 패턴을 반영해 권장 거리를 1km 낮췄습니다.`;
+      }
+    } else if (matched >= 6 && /이지런|지속주|롱/.test(adjusted.type)) {
+      adjusted.note = `${adjusted.note} 최근 추천 수행률이 좋아 현재 범위를 유지합니다.`;
+    }
+
+    return adjusted;
+  }
+
+  function decorateLatestRunAssessment(runningPanel) {
+    const recentSection = [...(runningPanel?.querySelectorAll("section.card") || [])]
+      .find(section => section.querySelector("h2")?.textContent.trim() === "최근 운동");
+    const article = recentSection?.querySelector(".logs article");
+    if (!article || article.querySelector(".bb-run-assessment")) return;
+
+    evaluateRecommendationHistory();
+    const store = getPersonalizationStore();
+    const latest = getRecommendationLogs()[0];
+    if (!latest) return;
+
+    const assessment = store.assessments[recommendationDateKey(latest.date)];
+    if (!assessment) return;
+
+    const badge = document.createElement("div");
+    badge.className = `bb-run-assessment is-${assessment.status}`;
+    badge.innerHTML = `
+      <span>${assessment.label}</span>
+      <small>${assessment.reason}</small>
+    `;
+    article.appendChild(badge);
   }
 
   function getNearestRecommendationRace() {
@@ -1129,6 +1401,7 @@
       appData.logs = remaining;
       recalculateManagerWeek();
       localStorage.setItem("roadToSub60_v1", JSON.stringify(appData));
+      removeRunAssessment(target.date);
     }
 
     reopenManager();
@@ -1162,9 +1435,19 @@
       appData.logs = logs;
       recalculateManagerWeek();
       localStorage.setItem("roadToSub60_v1", JSON.stringify(appData));
+      removeRunAssessment(target.date);
+      evaluateRecommendationHistory();
     }
 
     reopenManager();
+  }
+
+  function removeRunAssessment(date) {
+    const key = recommendationDateKey(date);
+    if (!key) return;
+    const store = getPersonalizationStore();
+    delete store.assessments[key];
+    savePersonalizationStore(store);
   }
 
   function deleteManagerBody(date) {
@@ -1222,6 +1505,7 @@
     if (!confirm("정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) return;
 
     localStorage.removeItem("sub60-body-balance-v1");
+    localStorage.removeItem(PERSONALIZATION_KEY);
 
     if (typeof appData !== "undefined") {
       appData.logs = [];
