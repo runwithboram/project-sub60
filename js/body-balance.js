@@ -249,6 +249,13 @@
         </div>
       </div>
 
+      ${recommendation.signal ? `
+        <div class="bb-today-run-signal">
+          <small>최근 기록 반영</small>
+          <b>${recommendation.signal}</b>
+        </div>
+      ` : ""}
+
       <p class="bb-today-run-reason">${recommendation.reason}</p>
 
       ${warning ? `
@@ -347,13 +354,25 @@
     const days = race ? daysUntilRecommendationRace(race.date) : null;
     const logs = getRecommendationLogs();
     const body = getBodyTrend(getRecords());
+    const latest = logs[0] || null;
+    const prior = logs[1] || null;
+    const today = recommendationStartDay(new Date());
+    const weekday = today.getDay();
+    const daysSinceLast = latest
+      ? Math.max(0, Math.floor((today - recommendationStartDay(new Date(latest.date))) / 86400000))
+      : null;
+
+    const latestPace = latest ? recommendationLogPaceSeconds(latest) : null;
+    const priorPace = prior ? recommendationLogPaceSeconds(prior) : null;
+    const paceDelta =
+      latestPace !== null && priorPace !== null
+        ? priorPace - latestPace
+        : null;
+
+    const latestHeartRate = recommendationValidHeartRate(latest?.avgHeartRate);
+    const priorHeartRate = recommendationValidHeartRate(prior?.avgHeartRate);
     const recent = summarizeRecommendationLogs(logs.slice(0, 4));
     const previous = summarizeRecommendationLogs(logs.slice(4, 8));
-
-    const paceTrend =
-      recent.paceSeconds !== null && previous.paceSeconds !== null
-        ? previous.paceSeconds - recent.paceSeconds
-        : null;
 
     const mileageJump =
       previous.distance > 0 &&
@@ -365,92 +384,27 @@
       body.muscleDelta !== null &&
       body.muscleDelta <= -0.5;
 
-    let recommendation;
+    const latestWasLong = Number(latest?.distance || 0) >= 9;
+    const latestWasFast =
+      latestPace !== null &&
+      latestPace <= recommendationReferencePace(logs) - 20;
+    const latestWasHard =
+      latestWasLong ||
+      latestWasFast ||
+      (latestHeartRate !== null && latestHeartRate >= 170);
 
-    if (days !== null && days <= 2) {
-      recommendation = {
-        type: days === 0 ? "레이스 데이" : "휴식 또는 아주 가벼운 조깅",
-        distance: days === 0 ? "10km" : "2~3km 선택",
-        pace: days === 0 ? "목표 페이스 5'59\"/km" : "말할 수 있을 만큼 편하게",
-        purpose: "컨디션 최우선",
-        reason:
-          `${race.name}까지 ${formatRecommendationDday(days)}입니다. 지금은 체력을 더 만드는 것보다 피로를 남기지 않는 것이 중요합니다.`,
-        note:
-          "통증이나 무거움이 있으면 조깅도 생략하세요."
-      };
-    } else if (days !== null && days <= 7) {
-      recommendation = {
-        type: "짧은 레이스 페이스 적응",
-        distance: "4~5km",
-        pace: "이지 2km + 6'00\"~6'10\"/km 1~2km",
-        purpose: "다리 감각 유지",
-        reason:
-          `${race.name} ${formatRecommendationDday(days)}입니다. 훈련량은 줄이되 목표 페이스 감각만 짧게 확인하는 시기입니다.`,
-        note:
-          "끝까지 힘들게 밀지 말고 여유를 남겨 마치세요."
-      };
-    } else if (muscleLoss || mileageJump) {
-      recommendation = {
-        type: "회복 이지런",
-        distance: "4~5km",
-        pace: "7'25\"~7'50\"/km",
-        purpose: "회복과 근육 보호",
-        reason: muscleLoss
-          ? "최근 골격근량 감소 신호가 있어 강도보다 편안한 움직임과 회복을 우선합니다."
-          : "최근 러닝 거리가 빠르게 늘어 이번 한 회는 훈련 부담을 낮추는 편이 안전합니다.",
-        note:
-          body.available
-            ? "체성분은 보정 요소로만 반영했습니다."
-            : "인바디가 없어도 러닝 기록만으로 추천됩니다."
-      };
-    } else if (days !== null && days <= 21) {
-      recommendation = paceTrend !== null && paceTrend < -8
-        ? {
-            type: "안정적인 이지런",
-            distance: "5~6km",
-            pace: "7'20\"~7'45\"/km",
-            purpose: "피로 조절",
-            reason:
-              `${race.name} ${formatRecommendationDday(days)}이지만 최근 페이스 흐름이 다소 떨어져 이번에는 회복을 먼저 확보합니다.`,
-            note:
-              "다음 훈련에서 컨디션이 회복되면 목표 페이스 구간을 넣으세요."
-          }
-        : {
-            type: "10K 목표 페이스 적응",
-            distance: "6~7km",
-            pace: "이지 2km + 6'05\"~6'15\"/km 3km",
-            purpose: "Sub60 페이스 감각",
-            reason:
-              `${race.name} ${formatRecommendationDday(days)}입니다. 실전 페이스를 길게 버티기보다 짧고 안정적으로 익히는 시기입니다.`,
-            note:
-              "빠른 구간 사이에 2~3분 걷거나 천천히 뛰어도 됩니다."
-          };
-    } else if (days !== null && days <= 49) {
-      recommendation = {
-        type: "지속주",
-        distance: "6~7km",
-        pace: "6'45\"~7'05\"/km",
-        purpose: "지구력과 페이스 안정",
-        reason:
-          `${race.name} ${formatRecommendationDday(days)}입니다. 기반을 유지하면서 Sub60보다 여유 있는 페이스를 오래 끌고 가는 능력을 키울 시기입니다.`,
-        note:
-          recent.count < 2
-            ? "최근 기록이 적어 보수적으로 추천했습니다."
-            : "마지막 1km까지 같은 리듬을 유지하는 것이 목표입니다."
-      };
-    } else {
-      recommendation = {
-        type: "이지런",
-        distance: "5~6km",
-        pace: "7'15\"~7'40\"/km",
-        purpose: "유산소 기반 만들기",
-        reason: race
-          ? `${race.name} ${formatRecommendationDday(days)}입니다. 아직 기반을 쌓는 시기이므로 거리와 꾸준함을 우선합니다.`
-          : "예정된 대회가 없어 최근 러닝 흐름을 기준으로 무리 없는 이지런을 추천합니다.",
-        note:
-          "호흡이 편하고 대화할 수 있는 강도로 달리세요."
-      };
-    }
+    const signal = buildRecommendationSignal({
+      latest,
+      prior,
+      daysSinceLast,
+      latestPace,
+      priorPace,
+      paceDelta,
+      latestHeartRate,
+      priorHeartRate
+    });
+
+    let recommendation;
 
     if (!logs.length) {
       recommendation = {
@@ -459,17 +413,242 @@
         pace: "7'30\"~8'00\"/km",
         purpose: "현재 상태 확인",
         reason: race
-          ? `${race.name} ${formatRecommendationDday(days)}입니다. 최근 러닝 기록이 없어 첫 회는 편안하게 현재 컨디션을 확인합니다.`
-          : "최근 러닝 기록이 없어 첫 회는 편안하게 현재 컨디션을 확인합니다.",
-        note:
-          "한 번 기록하면 다음 추천부터 실제 페이스 흐름을 반영합니다."
+          ? `${race.name} ${formatRecommendationDday(days)}입니다. 첫 기록은 편안하게 달리며 현재 컨디션을 확인합니다.`
+          : "최근 러닝 기록이 없어 편안한 강도로 현재 컨디션부터 확인합니다.",
+        note: "한 번 기록하면 다음 추천부터 실제 페이스와 심박 흐름을 반영합니다."
+      };
+    } else if (days !== null && days <= 2) {
+      recommendation = {
+        type: days === 0 ? "레이스 데이" : "휴식 또는 가벼운 조깅",
+        distance: days === 0 ? "10km" : "2~3km 선택",
+        pace: days === 0 ? "목표 페이스 5'59\"/km" : "말할 수 있을 만큼 편하게",
+        purpose: "컨디션 최우선",
+        reason: `${race.name} ${formatRecommendationDday(days)}입니다. 지금은 체력을 더 만드는 것보다 피로를 남기지 않는 것이 중요합니다.`,
+        note: "통증이나 무거움이 있으면 조깅도 생략하세요."
+      };
+    } else if (days !== null && days <= 7) {
+      recommendation = {
+        type: daysSinceLast === 0 ? "휴식" : "짧은 레이스 페이스 적응",
+        distance: daysSinceLast === 0 ? "러닝 없음" : "4~5km",
+        pace: daysSinceLast === 0 ? "가벼운 걷기만" : "이지 2km + 6'00\"~6'10\"/km 1~2km",
+        purpose: "다리 감각 유지",
+        reason: `${race.name} ${formatRecommendationDday(days)}입니다. 훈련량은 줄이고 목표 페이스 감각만 짧게 확인합니다.`,
+        note: "끝까지 힘들게 밀지 말고 여유를 남겨 마치세요."
+      };
+    } else if (daysSinceLast === 0) {
+      recommendation = {
+        type: "회복 또는 휴식",
+        distance: "러닝 없음 · 산책 20~30분",
+        pace: "편안한 걷기",
+        purpose: "어제 훈련 흡수",
+        reason: latestWasHard
+          ? "오늘 이미 러닝 기록이 있습니다. 강한 자극 뒤에는 추가 훈련보다 회복이 기록 향상에 도움이 됩니다."
+          : "오늘 러닝을 완료했으므로 추가 거리보다 수분·영양과 가벼운 움직임에 집중합니다.",
+        note: "다리가 가볍더라도 같은 날 두 번째 러닝은 권하지 않습니다."
+      };
+    } else if (daysSinceLast === 1 && latestWasHard) {
+      recommendation = {
+        type: "회복 이지런 또는 휴식",
+        distance: "3~4km 선택",
+        pace: recommendationEasyPace(logs, 35, 65),
+        purpose: "피로 제거",
+        reason: latestWasLong
+          ? `어제 ${Number(latest.distance).toFixed(1)}km를 달려 오늘은 거리를 줄이는 편이 좋습니다.`
+          : "어제 러닝의 페이스 또는 심박 강도가 높아 오늘은 회복을 우선합니다.",
+        note: "다리가 무겁거나 안정 시 심박이 평소보다 높다면 휴식을 선택하세요."
+      };
+    } else if (muscleLoss || mileageJump) {
+      recommendation = {
+        type: "회복 이지런",
+        distance: "4~5km",
+        pace: recommendationEasyPace(logs, 30, 55),
+        purpose: "회복과 근육 보호",
+        reason: muscleLoss
+          ? "최근 골격근량 감소 신호가 있어 강도보다 편안한 움직임과 회복을 우선합니다."
+          : "최근 4회 러닝 거리가 이전 4회보다 빠르게 늘어 이번 한 회는 부담을 낮춥니다.",
+        note: "러닝 후 단백질과 탄수화물을 함께 보충하세요."
+      };
+    } else if (daysSinceLast !== null && daysSinceLast >= 4) {
+      recommendation = {
+        type: "리듬 회복 이지런",
+        distance: "4~5km",
+        pace: recommendationEasyPace(logs, 25, 55),
+        purpose: "러닝 감각 되찾기",
+        reason: `마지막 러닝 후 ${daysSinceLast}일이 지났습니다. 빠른 훈련보다 편안한 거리로 다시 흐름을 잇습니다.`,
+        note: "첫 1km는 권장 범위보다 더 천천히 시작하세요."
+      };
+    } else if (weekday === 1) {
+      const weekNumber = recommendationWeekNumber(today);
+      recommendation = weekNumber % 2 === 0
+        ? {
+            type: "템포 구간주",
+            distance: "6~7km",
+            pace: "이지 2km + 6'15\"~6'30\"/km 3km",
+            purpose: "역치와 페이스 유지",
+            reason: "월요일 핵심 러닝입니다. 최근 기록을 기준으로 목표 페이스보다 여유 있는 구간을 안정적으로 이어갑니다.",
+            note: "빠른 구간에서 호흡이 무너지면 10~15초 늦춰도 됩니다."
+          }
+        : {
+            type: "짧은 인터벌",
+            distance: "총 5~6km",
+            pace: "400m × 5회 · 5'50\"~6'05\"/km",
+            purpose: "스피드 여유 만들기",
+            reason: "월요일 핵심 러닝입니다. 짧은 구간으로 Sub60 페이스보다 빠른 움직임을 익힙니다.",
+            note: "각 400m 사이에는 200m를 걷거나 아주 천천히 뛰세요."
+          };
+    } else if (weekday === 3) {
+      recommendation = {
+        type: "짧은 이지런",
+        distance: "4~5km",
+        pace: recommendationEasyPace(logs, 25, 50),
+        purpose: "회복과 주간 리듬",
+        reason: "수요일은 필라테스와 겹칠 수 있어 러닝 강도보다 짧고 편안한 리듬을 우선합니다.",
+        note: "필라테스 강도가 높았다면 3km만 달려도 충분합니다."
+      };
+    } else if (weekday === 6) {
+      recommendation = {
+        type: days !== null && days <= 21 ? "목표 페이스 지속주" : "롱 이지런",
+        distance: days !== null && days <= 21 ? "7~8km" : "8~10km",
+        pace: days !== null && days <= 21
+          ? "이지 2km + 6'10\"~6'25\"/km 4km"
+          : recommendationEasyPace(logs, 15, 40),
+        purpose: days !== null && days <= 21 ? "실전 지구력" : "유산소 기반",
+        reason: "토요일 추가 러닝은 이번 주의 긴 거리 역할을 맡습니다. 초반을 억제하고 후반까지 같은 리듬을 유지합니다.",
+        note: "마지막 1~2km만 자연스럽게 조금 빨라지는 정도면 충분합니다."
+      };
+    } else if (weekday === 2 || weekday === 4) {
+      recommendation = {
+        type: "수영 또는 회복",
+        distance: "러닝 선택 3~4km",
+        pace: recommendationEasyPace(logs, 40, 70),
+        purpose: "교차훈련과 회복",
+        reason: `${weekday === 2 ? "화요일" : "목요일"}은 수영 일정이 있어 러닝을 추가한다면 매우 가볍게만 진행합니다.`,
+        note: "수영에서 피로가 느껴지면 러닝은 생략하세요."
+      };
+    } else if (weekday === 5) {
+      recommendation = {
+        type: "휴식 또는 짧은 조깅",
+        distance: "0~4km 선택",
+        pace: recommendationEasyPace(logs, 40, 75),
+        purpose: "토요일 훈련 준비",
+        reason: "금요일은 필라테스 후 토요일 러닝을 앞둔 날입니다. 오늘의 목표는 훈련 효과보다 피로를 남기지 않는 것입니다.",
+        note: "몸이 가볍다는 확신이 있을 때만 짧게 달리세요."
+      };
+    } else {
+      recommendation = {
+        type: "회복 이지런",
+        distance: "4~5km",
+        pace: recommendationEasyPace(logs, 30, 60),
+        purpose: "피로 정리",
+        reason: "최근 러닝 흐름을 이어가되 다음 핵심 훈련을 위해 강도는 낮게 유지합니다.",
+        note: "호흡이 편하고 대화가 가능한 범위를 지키세요."
+      };
+    }
+
+    if (
+      daysSinceLast === 1 &&
+      !latestWasHard &&
+      recommendation.type.includes("지속") &&
+      paceDelta !== null &&
+      paceDelta < -20
+    ) {
+      recommendation = {
+        type: "안정적인 이지런",
+        distance: "4~5km",
+        pace: recommendationEasyPace(logs, 30, 60),
+        purpose: "컨디션 확인",
+        reason: "어제 페이스가 직전 기록보다 다소 느렸습니다. 오늘은 기록보다 편안한 움직임으로 회복 상태를 확인합니다.",
+        note: "첫 2km가 무겁다면 예정 거리보다 일찍 마쳐도 됩니다."
       };
     }
 
     return {
       ...recommendation,
+      signal,
       dday: race ? `${formatRecommendationDday(days)} · ${race.name}` : "대회 일정 없음"
     };
+  }
+
+  function recommendationLogPaceSeconds(log) {
+    const distance = Number(log?.distance || 0);
+    const seconds = inbodyRunSeconds(log?.time);
+    return distance > 0 && seconds > 0 ? seconds / distance : null;
+  }
+
+  function recommendationValidHeartRate(value) {
+    const number = Number(value);
+    return Number.isFinite(number) && number >= 40 && number <= 230
+      ? Math.round(number)
+      : null;
+  }
+
+  function recommendationReferencePace(logs) {
+    const summary = summarizeRecommendationLogs(logs.slice(0, 5));
+    return summary.paceSeconds ?? 450;
+  }
+
+  function recommendationFormatPace(totalSeconds) {
+    const seconds = Math.max(240, Math.min(600, Math.round(totalSeconds)));
+    const minutes = Math.floor(seconds / 60);
+    return `${minutes}'${String(seconds % 60).padStart(2, "0")}"/km`;
+  }
+
+  function recommendationEasyPace(logs, slowerMin, slowerMax) {
+    const base = recommendationReferencePace(logs);
+    return `${recommendationFormatPace(base + slowerMin)}~${recommendationFormatPace(base + slowerMax)}`;
+  }
+
+  function recommendationWeekNumber(date) {
+    const start = new Date(date.getFullYear(), 0, 1);
+    return Math.ceil((((date - start) / 86400000) + start.getDay() + 1) / 7);
+  }
+
+  function buildRecommendationSignal({
+    latest,
+    prior,
+    daysSinceLast,
+    latestPace,
+    priorPace,
+    paceDelta,
+    latestHeartRate,
+    priorHeartRate
+  }) {
+    if (!latest) return "최근 러닝 기록 없음";
+
+    const dateText = daysSinceLast === 0
+      ? "오늘"
+      : daysSinceLast === 1
+        ? "어제"
+        : `${daysSinceLast}일 전`;
+
+    const parts = [
+      `${dateText} ${Number(latest.distance).toFixed(1)}km`,
+      latestPace !== null ? recommendationFormatPace(latestPace) : null,
+      latestHeartRate !== null ? `${latestHeartRate}bpm` : null
+    ].filter(Boolean);
+
+    let comparison = "";
+    if (prior && paceDelta !== null) {
+      const amount = Math.abs(Math.round(paceDelta));
+      if (amount >= 5) {
+        comparison = paceDelta > 0
+          ? ` · 직전보다 ${amount}초/km 빠름`
+          : ` · 직전보다 ${amount}초/km 느림`;
+      }
+    }
+
+    if (
+      latestHeartRate !== null &&
+      priorHeartRate !== null &&
+      Math.abs(latestHeartRate - priorHeartRate) >= 3
+    ) {
+      const delta = latestHeartRate - priorHeartRate;
+      comparison += delta > 0
+        ? ` · 심박 ${delta} 높음`
+        : ` · 심박 ${Math.abs(delta)} 낮음`;
+    }
+
+    return parts.join(" · ") + comparison;
   }
 
   function getNearestRecommendationRace() {
