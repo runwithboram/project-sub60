@@ -60,9 +60,10 @@
     removeLegacyRecordManagement(runningPanel);
     removeLegacyMetrics(runningPanel);
     enhanceRunningHero(runningPanel);
-    mountRunningCoachCards(runningPanel);
+    const todayRecommendation = mountRunningCoachCards(runningPanel);
     compactRecentRuns(runningPanel);
     decorateLatestRunAssessment(runningPanel);
+    streamlineRunningDashboard(runningPanel, todayRecommendation);
 
     const balancePanel = document.createElement("div");
     balancePanel.id = "bbBalancePanel";
@@ -279,6 +280,219 @@
     `;
 
     hero.insertAdjacentElement("afterend", card);
+    window.sub60TodayRecommendation = recommendation;
+    return recommendation;
+  }
+
+  function streamlineRunningDashboard(runningPanel, recommendation) {
+    if (!runningPanel || !recommendation) return;
+
+    unifyAiCoachRecommendation(runningPanel, recommendation);
+    replaceDuplicateSub60Progress(runningPanel);
+    simplifyWeeklyReport(runningPanel);
+    relabelWeeklyDistanceCard(runningPanel);
+  }
+
+  function unifyAiCoachRecommendation(runningPanel, recommendation) {
+    const coachCard = runningPanel.querySelector(".ai-coach-card");
+    if (!coachCard) return;
+
+    const nextRun = coachCard.querySelector(".next-run-card");
+    if (nextRun) {
+      nextRun.classList.add("bb-coach-why");
+      nextRun.innerHTML = `
+        <div>
+          <span>WHY TODAY</span>
+          <b>오늘 추천 해설</b>
+        </div>
+        <p>${recommendation.reason}</p>
+        <small>${recommendation.note}</small>
+      `;
+    }
+
+    const summary = coachCard.querySelector(".coach-summary");
+    if (summary) {
+      summary.textContent =
+        "훈련명·거리·페이스는 위의 ‘오늘의 러닝’을 단일 기준으로 사용합니다. " +
+        "AI Coach는 최근 기록을 바탕으로 추천 이유만 설명합니다.";
+    }
+
+    const note = coachCard.querySelector(".coach-note");
+    if (note) {
+      note.textContent =
+        "오늘의 러닝과 동일한 추천 엔진을 사용합니다. 몸 상태가 좋지 않으면 회복을 우선하세요.";
+    }
+  }
+
+  function replaceDuplicateSub60Progress(runningPanel) {
+    const dashboard = runningPanel.querySelector("#efficiencyDashboard");
+    const panel = dashboard?.querySelector(".goal-panel");
+    if (!dashboard || !panel) return;
+
+    const estimateText =
+      dashboard.querySelector(".latest-summary strong")?.textContent?.trim() ||
+      dashboard.querySelector(".dashboard-metrics > div:first-child b")?.textContent?.trim();
+
+    const estimateSeconds = recommendationTimeToSeconds(estimateText);
+    if (!estimateSeconds) return;
+
+    const milestone = getNextMilestone(estimateSeconds);
+    const gap = Math.max(0, estimateSeconds - milestone.seconds);
+
+    panel.classList.add("bb-milestone-panel");
+    panel.innerHTML = `
+      <div class="bb-milestone-head">
+        <div>
+          <span>NEXT MILESTONE</span>
+          <b>${milestone.label}</b>
+        </div>
+        <strong>${gap > 0 ? recommendationGapText(gap) : "달성"}</strong>
+      </div>
+      <p>${milestone.message}</p>
+    `;
+  }
+
+  function getNextMilestone(currentSeconds) {
+    const milestones = [
+      { seconds: 64 * 60 + 59, label: "1:04:59", message: "먼저 1시간 5분 벽을 넘어보세요." },
+      { seconds: 62 * 60 + 59, label: "1:02:59", message: "다음 단계는 1시간 3분 이내입니다." },
+      { seconds: 60 * 60 + 59, label: "1:00:59", message: "Sub60 바로 앞 단계까지 좁혀갑니다." },
+      { seconds: 59 * 60 + 59, label: "59:59", message: "최종 목표 Sub60에 도전합니다." }
+    ];
+
+    return milestones.find(item => currentSeconds > item.seconds) ||
+      { seconds: 59 * 60 + 59, label: "59:59", message: "현재 Sub60 달성권입니다. 기록을 안정적으로 유지하세요." };
+  }
+
+  function relabelWeeklyDistanceCard(runningPanel) {
+    const cards = [...runningPanel.querySelectorAll("section.card")];
+    const weeklyCard = cards.find(card => {
+      const title = card.querySelector(":scope > header h2, :scope > h2")?.textContent.trim();
+      return title === "이번 주";
+    });
+
+    const heading = weeklyCard?.querySelector("h2");
+    if (heading) heading.textContent = "이번 주 누적 거리";
+  }
+
+  function simplifyWeeklyReport(runningPanel) {
+    const report = runningPanel.querySelector(".weekly-report");
+    if (!report) return;
+
+    const currentWeekLogs = getCurrentWeekRecommendationLogs();
+    const balance = summarizeWeeklyTrainingBalance(currentWeekLogs);
+    const grid = report.querySelector(".weekly-report-grid");
+
+    if (grid) {
+      grid.innerHTML = `
+        <div>
+          <span>훈련 구성</span>
+          <b>${balance.composition}</b>
+        </div>
+        <div>
+          <span>러닝 횟수</span>
+          <b>${currentWeekLogs.length}회</b>
+        </div>
+        <div>
+          <span>평균 페이스</span>
+          <b>${balance.averagePace}</b>
+        </div>
+        <div>
+          <span>롱런 상태</span>
+          <b>${balance.longRun}</b>
+        </div>
+      `;
+    }
+
+    const coach = report.querySelector(".weekly-coach");
+    if (coach) {
+      const label = coach.querySelector("span");
+      const text = coach.querySelector("p");
+      if (label) label.textContent = "TRAINING BALANCE";
+      if (text) text.textContent = balance.summary;
+    }
+
+    const change = report.querySelector(".weekly-change");
+    if (change) {
+      change.textContent = balance.status;
+      change.className = `weekly-change ${balance.className}`;
+    }
+  }
+
+  function getCurrentWeekRecommendationLogs() {
+    const today = recommendationStartDay(new Date());
+    const day = today.getDay();
+    const mondayOffset = day === 0 ? -6 : 1 - day;
+    const start = new Date(today);
+    start.setDate(today.getDate() + mondayOffset);
+    const end = new Date(start);
+    end.setDate(start.getDate() + 7);
+
+    return getRecommendationLogs().filter(log => {
+      const date = new Date(log.date);
+      return date >= start && date < end;
+    });
+  }
+
+  function summarizeWeeklyTrainingBalance(logs) {
+    if (!logs.length) {
+      return {
+        composition: "기록 대기",
+        averagePace: "-",
+        longRun: "아직 없음",
+        summary: "이번 주 첫 러닝을 기록하면 훈련 구성과 균형을 분석합니다.",
+        status: "기록 대기",
+        className: "is-same"
+      };
+    }
+
+    let easy = 0;
+    let quality = 0;
+    let long = 0;
+    let totalDistance = 0;
+    let totalSeconds = 0;
+
+    logs.forEach(log => {
+      const distance = Number(log.distance || 0);
+      const pace = recommendationLogPaceSeconds(log);
+      totalDistance += distance;
+      totalSeconds += inbodyRunSeconds(log.time);
+
+      if (distance >= 8) long += 1;
+      if (pace !== null && pace <= 410) quality += 1;
+      else easy += 1;
+    });
+
+    const averagePace = totalDistance > 0
+      ? recommendationFormatPace(totalSeconds / totalDistance)
+      : "-";
+
+    let summary = "이지런과 강도 훈련의 균형이 안정적입니다.";
+    let status = "균형 양호";
+    let className = "is-up";
+
+    if (!long && logs.length >= 2) {
+      summary = "이번 주는 긴 거리 훈련이 아직 없습니다. 토요일에 8km 안팎의 편안한 러닝을 고려하세요.";
+      status = "롱런 부족";
+      className = "is-down";
+    } else if (quality >= 2) {
+      summary = "강도 높은 러닝 비중이 높습니다. 다음 러닝은 회복 강도로 조정하는 편이 좋습니다.";
+      status = "강도 높음";
+      className = "is-down";
+    } else if (easy >= 3 && quality === 0) {
+      summary = "유산소 기반은 잘 쌓이고 있습니다. 컨디션이 좋다면 다음 핵심일에 짧은 속도 자극을 넣으세요.";
+      status = "기반 중심";
+      className = "is-same";
+    }
+
+    return {
+      composition: `이지 ${easy} · 강도 ${quality}`,
+      averagePace,
+      longRun: long ? `${long}회 완료` : "아직 없음",
+      summary,
+      status,
+      className
+    };
   }
 
   function buildTodayBriefing(recommendation) {
