@@ -1778,3 +1778,37 @@
     gap: 16px !important;
   }
 }
+
+
+/* v10.4 recent-run responsive recommendation */
+#bbRunningPanel .bb-today-run-signal {
+  margin-top: 13px !important;
+  padding: 11px 12px !important;
+  border: 1px solid rgba(142, 199, 170, .14) !important;
+  border-radius: 12px !important;
+  background: rgba(119, 180, 150, .08) !important;
+}
+
+#bbRunningPanel .bb-today-run-signal small {
+  display: block !important;
+  margin-bottom: 4px !important;
+  color: #7fb99d !important;
+  -webkit-text-fill-color: #7fb99d !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: .04em !important;
+}
+
+#bbRunningPanel .bb-today-run-signal b {
+  color: rgba(241, 248, 244, .9) !important;
+  -webkit-text-fill-color: rgba(241, 248, 244, .9) !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  line-height: 1.5 !important;
+}
+
+@media (max-width: 380px) {
+  #bbRunningPanel .bb-today-run-signal b {
+    font-size: 11px !important;
+  }
+}
