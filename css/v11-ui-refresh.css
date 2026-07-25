@@ -1,0 +1,262 @@
+/* Road to SUB60 — v11 UI Refresh
+   Visual-only layer. Existing data, forms and calculation logic are unchanged. */
+:root {
+  --v11-bg: #f4f6f8;
+  --v11-surface: #ffffff;
+  --v11-surface-soft: #f7f8fa;
+  --v11-text: #18201d;
+  --v11-muted: #6f7874;
+  --v11-line: rgba(28, 43, 37, .10);
+  --v11-primary: #315d4f;
+  --v11-primary-soft: #e9f1ee;
+  --v11-accent: #d97849;
+  --v11-shadow: 0 8px 24px rgba(26, 45, 38, .07);
+}
+
+html { background: var(--v11-bg) !important; }
+body {
+  margin: 0 !important;
+  background: var(--v11-bg) !important;
+  color: var(--v11-text) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  width: min(100%, 480px) !important;
+  min-height: 100vh;
+  margin: 0 auto !important;
+  padding: max(12px, env(safe-area-inset-top)) 14px calc(34px + env(safe-area-inset-bottom)) !important;
+}
+
+/* Top mode switch */
+.bb-tabbar {
+  position: sticky !important;
+  top: max(8px, env(safe-area-inset-top)) !important;
+  z-index: 40 !important;
+  gap: 4px !important;
+  margin: 0 0 12px !important;
+  padding: 4px !important;
+  border: 1px solid var(--v11-line) !important;
+  border-radius: 15px !important;
+  background: rgba(255,255,255,.92) !important;
+  box-shadow: 0 6px 20px rgba(27,45,38,.07) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+}
+.bb-tab {
+  min-height: 42px !important;
+  padding: 0 12px !important;
+  border-radius: 11px !important;
+  color: var(--v11-muted) !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+}
+.bb-tab.is-active {
+  background: var(--v11-primary) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(49,93,79,.22) !important;
+}
+
+/* Running screen */
+#bbRunningPanel .hero {
+  position: relative;
+  overflow: hidden;
+  margin: 0 0 12px !important;
+  padding: 22px 20px !important;
+  border: 0 !important;
+  border-radius: 22px !important;
+  background: var(--v11-primary) !important;
+  box-shadow: 0 12px 28px rgba(49,93,79,.19) !important;
+  color: #fff !important;
+}
+#bbRunningPanel .hero::after {
+  content: "";
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  right: -52px;
+  top: -68px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.10);
+}
+#bbRunningPanel .hero > span {
+  position: relative;
+  z-index: 1;
+  font-size: 13px !important;
+  font-weight: 700;
+  opacity: .82 !important;
+}
+#bbRunningPanel .hero h1 {
+  position: relative;
+  z-index: 1;
+  margin: 7px 0 21px !important;
+  font-size: clamp(30px, 9vw, 39px) !important;
+  line-height: .98 !important;
+  letter-spacing: -.045em !important;
+}
+#bbRunningPanel .heroRow { position: relative; z-index: 1; }
+#bbRunningPanel .heroRow b {
+  font-size: clamp(38px, 12vw, 52px) !important;
+  line-height: .95 !important;
+  letter-spacing: -.05em;
+}
+#bbRunningPanel .heroRow small { opacity: .82; }
+#bbRunningPanel .heroRow em {
+  padding: 8px 11px !important;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.12) !important;
+  font-size: 13px;
+  backdrop-filter: blur(8px);
+}
+
+#bbRunningPanel .card,
+#bbRunningPanel .metrics {
+  margin-bottom: 12px !important;
+  border: 1px solid var(--v11-line) !important;
+  border-radius: 20px !important;
+  background: var(--v11-surface) !important;
+  box-shadow: var(--v11-shadow) !important;
+  color: var(--v11-text) !important;
+}
+#bbRunningPanel .card { padding: 18px !important; }
+#bbRunningPanel .card h2 {
+  margin: 0 0 14px !important;
+  color: var(--v11-text) !important;
+  font-size: 18px !important;
+  letter-spacing: -.02em;
+}
+#bbRunningPanel .card p { color: #46504c !important; }
+#bbRunningPanel .card header b { color: var(--v11-primary) !important; }
+#bbRunningPanel label span,
+#bbRunningPanel .preview span,
+#bbRunningPanel .metrics span,
+#bbRunningPanel .logs small,
+#bbRunningPanel .muted,
+#bbRunningPanel .card > small {
+  color: var(--v11-muted) !important;
+}
+#bbRunningPanel input {
+  min-height: 51px;
+  padding: 13px 14px !important;
+  border: 1px solid var(--v11-line) !important;
+  border-radius: 13px !important;
+  background: var(--v11-surface-soft) !important;
+  color: var(--v11-text) !important;
+  font-size: 17px !important;
+  box-shadow: none !important;
+}
+#bbRunningPanel input:focus {
+  border-color: rgba(49,93,79,.42) !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 3px rgba(49,93,79,.10) !important;
+}
+#bbRunningPanel button:not(.bb-tab),
+#bbRunningPanel .capture-button {
+  min-height: 49px;
+  border-radius: 13px !important;
+  font-weight: 850 !important;
+}
+#bbRunningPanel #saveRun,
+#bbRunningPanel .ocr-button {
+  background: var(--v11-primary) !important;
+  color: #fff !important;
+  box-shadow: 0 7px 16px rgba(49,93,79,.17) !important;
+}
+#bbRunningPanel .capture-button {
+  border: 1px dashed rgba(49,93,79,.35) !important;
+  background: var(--v11-primary-soft) !important;
+  color: var(--v11-primary) !important;
+}
+#bbRunningPanel .secondary-button {
+  background: #eef1ef !important;
+  color: #4e5a55 !important;
+}
+#bbRunningPanel .capture-preview,
+#bbRunningPanel .preview > div,
+#bbRunningPanel .logs article,
+#bbRunningPanel .metrics > div {
+  border: 1px solid rgba(28,43,37,.06) !important;
+  border-radius: 14px !important;
+  background: var(--v11-surface-soft) !important;
+  color: var(--v11-text) !important;
+}
+#bbRunningPanel .preview { gap: 8px !important; }
+#bbRunningPanel .preview > div { padding: 13px !important; }
+#bbRunningPanel .preview b,
+#bbRunningPanel .metrics b,
+#bbRunningPanel .logs b { color: var(--v11-text) !important; }
+#bbRunningPanel .track {
+  height: 9px !important;
+  background: #e7ebe9 !important;
+}
+#bbRunningPanel .track i {
+  background: var(--v11-primary) !important;
+}
+#bbRunningPanel .metrics {
+  gap: 8px !important;
+  padding: 8px !important;
+}
+#bbRunningPanel .metrics > div { padding: 13px !important; }
+#bbRunningPanel .weekly-report-grid { gap: 8px !important; }
+#bbRunningPanel .weekly-report-grid > div,
+#bbRunningPanel .weekly-coach {
+  border: 1px solid rgba(28,43,37,.06) !important;
+  background: var(--v11-surface-soft) !important;
+}
+#bbRunningPanel .weekly-change { border-radius: 999px !important; }
+
+/* Body Balance screen — same visual system */
+#bbBalancePanel { color: var(--v11-text) !important; }
+#bbBalancePanel .bb-hero {
+  padding: 22px 20px !important;
+  border-radius: 22px !important;
+  background: var(--v11-primary) !important;
+  box-shadow: 0 12px 28px rgba(49,93,79,.19) !important;
+}
+#bbBalancePanel .bb-card {
+  margin-top: 12px !important;
+  padding: 18px !important;
+  border: 1px solid var(--v11-line) !important;
+  border-radius: 20px !important;
+  background: #fff !important;
+  box-shadow: var(--v11-shadow) !important;
+}
+#bbBalancePanel .bb-metric,
+#bbBalancePanel .bb-history-item,
+#bbBalancePanel .bb-insight,
+#bbBalancePanel .bb-comparison-item {
+  border-radius: 14px !important;
+  background: var(--v11-surface-soft) !important;
+}
+#bbBalancePanel .bb-button,
+#bbBalancePanel .bb-file-button {
+  min-height: 47px !important;
+  border-radius: 13px !important;
+  background: var(--v11-primary) !important;
+}
+#bbBalancePanel .bb-button.secondary,
+#bbBalancePanel .bb-file-button.secondary {
+  background: var(--v11-primary-soft) !important;
+  color: var(--v11-primary) !important;
+}
+#bbBalancePanel input,
+#bbBalancePanel select,
+#bbBalancePanel textarea {
+  border: 1px solid var(--v11-line) !important;
+  border-radius: 12px !important;
+  background: var(--v11-surface-soft) !important;
+  color: var(--v11-text) !important;
+}
+
+/* Motion and accessibility */
+button, .capture-button, .bb-tab { -webkit-tap-highlight-color: transparent; }
+button:active, .capture-button:active, .bb-tab:active { transform: scale(.985); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+}
+@media (max-width: 360px) {
+  .app { padding-left: 10px !important; padding-right: 10px !important; }
+  #bbRunningPanel .card, #bbBalancePanel .bb-card { padding: 15px !important; }
+}
