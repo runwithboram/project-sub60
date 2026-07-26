@@ -458,3 +458,30 @@ body {
 #bbRunningPanel .hero-pace {
   margin-top: 18px;
 }
+
+/* v10.5.2 — Recent run assessment readability */
+#bbRunningPanel .logs article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  column-gap: 18px;
+  row-gap: 12px;
+}
+
+#bbRunningPanel .logs article > div:nth-child(2) {
+  text-align: right;
+}
+
+#bbRunningPanel .logs article .bb-run-assessment {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-top: 0 !important;
+  box-sizing: border-box;
+}
+
+#bbRunningPanel .bb-run-assessment small {
+  font-size: 11px !important;
+  line-height: 1.5 !important;
+  word-break: keep-all !important;
+  overflow-wrap: break-word !important;
+}
