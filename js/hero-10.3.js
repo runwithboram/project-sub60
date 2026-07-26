@@ -86,7 +86,7 @@
         </div>
 
         <div class="hero-gap">
-          <span>${gapSeconds > 0 ? "목표까지 단축할 기록" : "현재 상태"}</span>
+          <span>${gapSeconds > 0 ? "SUB60까지" : "현재 상태"}</span>
           <div class="hero-gap-value">
             <strong>${gapSeconds > 0 ? gap : "달성권"}</strong>
             ${gapSeconds > 0 ? "<em>남음</em>" : "<em>SUB60</em>"}
@@ -113,7 +113,7 @@
         </div>
 
         <div class="hero-pace">
-          <span>이번 주 훈련 기준</span>
+          <span>이번 주 목표 페이스</span>
           <b>6'15" ~ 6'25"/km</b>
         </div>
       </div>
