@@ -1,0 +1,443 @@
+/* Road to SUB60 v10.5 — Home Redesign
+   UI-only override. Existing data, forms and features remain unchanged. */
+
+:root {
+  --home-bg: #07111f;
+  --home-surface: rgba(15, 28, 47, 0.92);
+  --home-surface-2: rgba(24, 40, 65, 0.86);
+  --home-line: rgba(159, 190, 226, 0.12);
+  --home-text: #f7fbff;
+  --home-muted: #9eb0ca;
+  --home-blue: #46a8ff;
+  --home-green: #46d7a3;
+}
+
+body {
+  background:
+    radial-gradient(circle at 50% -120px, rgba(70, 168, 255, 0.20), transparent 390px),
+    linear-gradient(180deg, #081423 0%, var(--home-bg) 36%, #050c16 100%);
+}
+
+.app {
+  padding: max(14px, env(safe-area-inset-top)) 16px calc(50px + env(safe-area-inset-bottom));
+}
+
+/* Main navigation */
+#bbTabbar.bb-tabbar {
+  top: max(8px, env(safe-area-inset-top));
+  z-index: 50;
+  gap: 4px;
+  margin: 0 0 14px;
+  padding: 4px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 15px;
+  background: rgba(7,17,31,.76);
+  box-shadow: 0 12px 32px rgba(0,0,0,.22);
+  backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+}
+
+#bbTabbar .bb-tab {
+  min-height: 42px;
+  border-radius: 11px;
+  color: #8195b1;
+  font-size: 14px;
+  letter-spacing: -.01em;
+  transition: background .2s ease, color .2s ease, transform .15s ease;
+}
+
+#bbTabbar .bb-tab.is-active {
+  background: linear-gradient(135deg, rgba(70,168,255,.98), rgba(44,122,235,.98));
+  color: white;
+  box-shadow: 0 7px 18px rgba(34,117,226,.30), inset 0 1px rgba(255,255,255,.22);
+}
+
+#bbRunningPanel {
+  display: grid;
+  gap: 14px;
+}
+
+#bbRunningPanel > * {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Hero: one clear focal point */
+#bbRunningPanel .hero {
+  min-height: 370px;
+  padding: 25px 22px 20px;
+  border: 1px solid rgba(113,177,255,.18);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 88% 6%, rgba(70,215,163,.20), transparent 30%),
+    radial-gradient(circle at 3% 42%, rgba(70,168,255,.18), transparent 34%),
+    linear-gradient(155deg, #102643 0%, #0b1729 52%, #08111f 100%);
+  box-shadow: 0 24px 60px rgba(0,0,0,.30), inset 0 1px rgba(255,255,255,.07);
+}
+
+#bbRunningPanel .hero::before {
+  content: "";
+  position: absolute;
+  width: 190px;
+  height: 190px;
+  right: -82px;
+  top: -88px;
+  border: 34px solid rgba(70,168,255,.055);
+  border-radius: 50%;
+}
+
+#bbRunningPanel .hero::after {
+  inset: auto -10% -28% 14%;
+  height: 180px;
+  border-color: rgba(70,168,255,.15);
+}
+
+#bbRunningPanel .hero-eyebrow {
+  margin-bottom: 8px;
+  color: #a7c6eb;
+  font-size: 11px;
+  letter-spacing: .22em;
+}
+
+#bbRunningPanel .hero-sub60 h1 {
+  font-size: clamp(45px, 13vw, 59px);
+  line-height: .86;
+  letter-spacing: -.07em;
+  text-shadow: 0 8px 28px rgba(0,0,0,.28);
+}
+
+#bbRunningPanel .hero-sub60 h1 strong {
+  background: linear-gradient(130deg, #73e8bd, #46d7a3);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+#bbRunningPanel .hero-gap {
+  margin-top: 29px;
+}
+
+#bbRunningPanel .hero-gap > span {
+  margin-bottom: 7px;
+  color: #91a8c5;
+  font-size: 12px;
+}
+
+#bbRunningPanel .hero-gap-value {
+  gap: 8px;
+}
+
+#bbRunningPanel .hero-gap-value strong {
+  font-size: clamp(45px, 12vw, 58px);
+  letter-spacing: -.065em;
+  background: linear-gradient(95deg, #74bdff 0%, #46a8ff 48%, #63e0b1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 9px 22px rgba(70,168,255,.14));
+}
+
+#bbRunningPanel .hero-gap-value em {
+  padding: 6px 9px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 999px;
+  background: rgba(255,255,255,.055);
+  color: #dfeeff;
+  font-size: 12px;
+}
+
+#bbRunningPanel .hero-records {
+  gap: 8px;
+  margin-top: 20px;
+}
+
+#bbRunningPanel .hero-record {
+  padding: 13px 14px 12px;
+  border-color: rgba(255,255,255,.09);
+  border-radius: 17px;
+  background: linear-gradient(145deg, rgba(255,255,255,.065), rgba(255,255,255,.025));
+  box-shadow: inset 0 1px rgba(255,255,255,.04);
+}
+
+#bbRunningPanel .hero-record span {
+  margin-bottom: 6px;
+  color: #8fa4c0;
+  font-size: 10px;
+  letter-spacing: .035em;
+}
+
+#bbRunningPanel .hero-record b {
+  font-size: 21px;
+}
+
+#bbRunningPanel .hero-route {
+  height: 58px;
+  margin: 2px 0 0;
+  opacity: .9;
+}
+
+#bbRunningPanel .hero-route-line {
+  top: 29px;
+  border-top-width: 2px;
+}
+
+#bbRunningPanel .hero-pace {
+  padding: 13px 1px 0;
+}
+
+#bbRunningPanel .hero-pace b {
+  font-size: 16px;
+  letter-spacing: -.02em;
+}
+
+/* TODAY: prominent second anchor */
+#bbRunningPanel .bb-today-run-card {
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  border: 1px solid rgba(70,215,163,.18) !important;
+  border-radius: 24px !important;
+  background:
+    radial-gradient(circle at 100% 0, rgba(70,215,163,.12), transparent 38%),
+    linear-gradient(145deg, rgba(21,43,61,.98), rgba(12,25,43,.98)) !important;
+  box-shadow: 0 19px 42px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.045) !important;
+}
+
+#bbRunningPanel .bb-today-run-card::after {
+  content: "";
+  position: absolute;
+  right: -28px;
+  bottom: -38px;
+  width: 108px;
+  height: 108px;
+  border: 22px solid rgba(70,215,163,.035);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+#bbRunningPanel .bb-today-run-header {
+  align-items: center;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255,255,255,.075);
+}
+
+#bbRunningPanel .bb-next-run-kicker {
+  display: inline-flex;
+  align-items: center;
+  min-height: 21px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(70,215,163,.12);
+  color: #71e2ba !important;
+  font-size: 10px !important;
+  letter-spacing: .13em;
+}
+
+#bbRunningPanel .bb-today-run-header h2 {
+  margin-top: 6px;
+  font-size: 21px;
+  letter-spacing: -.035em;
+}
+
+#bbRunningPanel .bb-today-run-header > b {
+  padding: 8px 11px;
+  border: 1px solid rgba(70,168,255,.16);
+  border-radius: 12px;
+  background: rgba(70,168,255,.09);
+  color: #8cc8ff;
+  font-size: 13px;
+}
+
+#bbRunningPanel .bb-today-run-title {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 18px 0 15px;
+}
+
+#bbRunningPanel .bb-today-run-title strong {
+  color: #fff;
+  font-size: clamp(27px, 8vw, 34px);
+  line-height: 1.05;
+  letter-spacing: -.055em;
+}
+
+#bbRunningPanel .bb-today-run-title span {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border-radius: 11px;
+  background: rgba(70,215,163,.12);
+  color: #75e1bb;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+#bbRunningPanel .bb-today-run-details {
+  gap: 8px;
+}
+
+#bbRunningPanel .bb-today-run-details > div,
+#bbRunningPanel .bb-today-run-signal,
+#bbRunningPanel .bb-learning-status {
+  border: 1px solid rgba(255,255,255,.065);
+  border-radius: 15px;
+  background: rgba(255,255,255,.035);
+}
+
+#bbRunningPanel .bb-today-run-details > div {
+  padding: 13px;
+}
+
+#bbRunningPanel .bb-today-run-details small,
+#bbRunningPanel .bb-today-run-signal small {
+  color: #8297b2;
+  font-size: 10px;
+  letter-spacing: .025em;
+}
+
+#bbRunningPanel .bb-today-run-details b {
+  margin-top: 5px;
+  color: #f0f7ff;
+  font-size: 15px;
+}
+
+#bbRunningPanel .bb-today-run-reason {
+  margin: 14px 0 8px;
+  color: #c0cfe1;
+  font-size: 13px;
+  line-height: 1.58;
+}
+
+#bbRunningPanel .bb-next-run-note {
+  color: #7f94ae;
+}
+
+#bbRunningPanel .bb-learning-status {
+  margin-top: 13px;
+  padding: 11px 12px;
+}
+
+/* All home cards: unified visual language */
+#bbRunningPanel > .card,
+#bbRunningPanel > .metrics,
+#bbRunningPanel .card:not(.bb-today-run-card) {
+  border: 1px solid var(--home-line);
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(22,35,56,.94), rgba(13,25,43,.94));
+  box-shadow: 0 15px 36px rgba(0,0,0,.20), inset 0 1px rgba(255,255,255,.035);
+}
+
+#bbRunningPanel .card {
+  padding: 19px;
+}
+
+#bbRunningPanel .card h2 {
+  color: #f5f9ff;
+  font-size: 19px;
+  letter-spacing: -.035em;
+}
+
+#bbRunningPanel .weekly-report-grid,
+#bbRunningPanel .preview,
+#bbRunningPanel .dashboard-metrics {
+  gap: 8px;
+}
+
+#bbRunningPanel .weekly-report-grid > div,
+#bbRunningPanel .preview > div,
+#bbRunningPanel .metrics > div,
+#bbRunningPanel .dashboard-metrics > div {
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 15px;
+  background: rgba(255,255,255,.035);
+}
+
+#bbRunningPanel .weekly-report-grid span,
+#bbRunningPanel .metrics span {
+  color: #8296b0;
+  font-size: 10px;
+  letter-spacing: .025em;
+}
+
+#bbRunningPanel .weekly-report-grid b,
+#bbRunningPanel .metrics b {
+  margin-top: 6px;
+  color: #f3f8ff;
+  font-size: 19px;
+  letter-spacing: -.035em;
+}
+
+#bbRunningPanel .track {
+  height: 8px;
+  margin: 15px 0 10px;
+  background: rgba(255,255,255,.055);
+}
+
+#bbRunningPanel .track i {
+  box-shadow: 0 0 14px rgba(70,168,255,.22);
+}
+
+#bbRunningPanel .logs {
+  gap: 8px;
+}
+
+#bbRunningPanel .logs article {
+  padding: 13px 14px;
+  border: 1px solid rgba(255,255,255,.05);
+  border-radius: 15px;
+  background: rgba(255,255,255,.035);
+}
+
+#bbRunningPanel .logs article b {
+  font-size: 15px;
+}
+
+#bbRunningPanel .logs article small {
+  font-size: 10px;
+}
+
+/* Buttons and fields */
+#bbRunningPanel button,
+#bbRunningPanel .capture-button {
+  border-radius: 14px;
+  transition: transform .15s ease, filter .15s ease, box-shadow .2s ease;
+}
+
+#bbRunningPanel button:not(.bb-tab) {
+  box-shadow: 0 10px 22px rgba(70,215,163,.13);
+}
+
+#bbRunningPanel button:active,
+#bbRunningPanel .capture-button:active {
+  transform: translateY(1px) scale(.985);
+}
+
+#bbRunningPanel input {
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 14px;
+  background: #f8fbff;
+}
+
+/* Gentle entrance, disabled for reduced-motion users */
+@media (prefers-reduced-motion: no-preference) {
+  #bbRunningPanel > .hero,
+  #bbRunningPanel > .bb-today-run-card,
+  #bbRunningPanel > .card,
+  #bbRunningPanel > .metrics {
+    animation: sub60-home-in .42s ease both;
+  }
+  #bbRunningPanel > .bb-today-run-card { animation-delay: .04s; }
+  #bbRunningPanel > .card:nth-of-type(3) { animation-delay: .08s; }
+
+  @keyframes sub60-home-in {
+    from { opacity: 0; transform: translateY(9px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+@media (max-width: 370px) {
+  .app { padding-inline: 13px; }
+  #bbRunningPanel .hero { min-height: 350px; padding-inline: 19px; }
+  #bbRunningPanel .hero-record b { font-size: 18px; }
+  #bbRunningPanel .bb-today-run-title { align-items: flex-start; flex-direction: column; }
+}
