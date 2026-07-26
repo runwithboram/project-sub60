@@ -64,6 +64,7 @@
     compactRecentRuns(runningPanel);
     decorateLatestRunAssessment(runningPanel);
     streamlineRunningDashboard(runningPanel, todayRecommendation);
+    arrangeRunningHome(runningPanel);
 
     const balancePanel = document.createElement("div");
     balancePanel.id = "bbBalancePanel";
@@ -80,6 +81,27 @@
 
     injectSettingsRecordManagement();
     refreshBalanceView();
+  }
+
+  function arrangeRunningHome(runningPanel) {
+    if (!runningPanel) return;
+
+    const directSections = [...runningPanel.children];
+    const hero = directSections.find(node => node.classList?.contains("hero"));
+    const today = runningPanel.querySelector(":scope > #bbTodayRunCard");
+    const weekly = directSections.find(node => {
+      const heading = node.querySelector?.(":scope > header h2, :scope > h2");
+      return /이번 주(?: 누적 거리)?/.test(heading?.textContent?.trim() || "");
+    });
+    const workout = directSections.find(node =>
+      node.classList?.contains("record-card") ||
+      node.querySelector?.(":scope > .record-panel-toggle")
+    );
+
+    // 목표 → 오늘 → 이번 주 → 기록의 흐름으로 홈 상단을 고정합니다.
+    [workout, weekly, today, hero]
+      .filter(Boolean)
+      .forEach(node => runningPanel.prepend(node));
   }
 
   function removeLegacyRecordManagement(runningPanel) {

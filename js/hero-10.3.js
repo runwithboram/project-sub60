@@ -31,35 +31,7 @@
       : "59:59";
   }
 
-  function getNextRaceInfo() {
-    if (!Array.isArray(appData?.races) || !appData.races.length) {
-      return { name: "다음 레이스", dday: "준비 중" };
-    }
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const race = appData.races
-      .map(item => ({ ...item, parsedDate: new Date(`${item.date}T00:00:00`) }))
-      .filter(item => !Number.isNaN(item.parsedDate.getTime()) && item.parsedDate >= today)
-      .sort((a, b) => a.parsedDate - b.parsedDate)[0] || appData.races[appData.races.length - 1];
-
-    const target = new Date(`${race.date}T00:00:00`);
-    const diff = Math.ceil((target - today) / 86400000);
-    const dday = diff > 0 ? `D-${diff}` : diff === 0 ? "D-DAY" : "완료";
-
-    return { name: race.name || "다음 레이스", dday };
-  }
-
-  function getProgress(currentSeconds, goalSeconds) {
-    const baseline = 75 * 60;
-    if (!currentSeconds || currentSeconds <= goalSeconds) return 100;
-    return Math.max(0, Math.min(100, Math.round(
-      ((baseline - currentSeconds) / (baseline - goalSeconds)) * 100
-    )));
-  }
-
-  function applyHeroV105() {
+  function applyHeroV1031() {
     const hero = document.querySelector(".hero");
     if (!hero || typeof appData === "undefined") return;
 
@@ -69,36 +41,18 @@
     const goalSeconds = timeToSeconds(goalRecord);
     const gapSeconds = Math.max(0, currentSeconds - goalSeconds);
     const gap = formatGap(gapSeconds);
-    const race = getNextRaceInfo();
-    const progress = getProgress(currentSeconds, goalSeconds);
 
     hero.innerHTML = `
-      <div class="hero-sub60 hero-sub60-v105">
-        <div class="hero-topline">
-          <div>
-            <span class="hero-eyebrow">ROAD TO</span>
-            <h1>SUB<strong>60</strong></h1>
-          </div>
-          <div class="hero-race-chip">
-            <b>${race.dday}</b>
-            <span>${race.name}</span>
-          </div>
-        </div>
+      <div class="hero-sub60">
+        <span class="hero-eyebrow">Road to</span>
+        <h1>SUB<strong>60</strong></h1>
 
         <div class="hero-gap">
-          <span>${gapSeconds > 0 ? "SUB60까지" : "현재 상태"}</span>
+          <span>목표까지</span>
           <div class="hero-gap-value">
             <strong>${gapSeconds > 0 ? gap : "달성권"}</strong>
-            ${gapSeconds > 0 ? "<em>남음</em>" : "<em>SUB60</em>"}
+            ${gapSeconds > 0 ? "<em>남음</em>" : ""}
           </div>
-        </div>
-
-        <div class="hero-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress}">
-          <div class="hero-progress-head">
-            <span>SUB60 여정</span>
-            <b>${progress}%</b>
-          </div>
-          <div class="hero-progress-track"><i style="width:${progress}%"></i></div>
         </div>
 
         <div class="hero-records">
@@ -112,6 +66,11 @@
           </div>
         </div>
 
+        <div class="hero-route" aria-hidden="true">
+          <i class="hero-route-line"></i>
+          <i class="hero-route-goal"></i>
+        </div>
+
         <div class="hero-pace">
           <span>이번 주 목표 페이스</span>
           <b>6'15" ~ 6'25"/km</b>
@@ -120,8 +79,8 @@
     `;
   }
 
-  window.renderApp = function renderAppHeroV105() {
+  window.renderApp = function () {
     originalRenderApp();
-    applyHeroV105();
+    applyHeroV1031();
   };
 })();
