@@ -1150,13 +1150,24 @@
     const assessment = store.assessments[recommendationDateKey(latest.date)];
     if (!assessment) return;
 
+    // Rebuild the latest-run card into an explicit two-row layout.
+    // Row 1: distance/date + time/pace. Row 2: assessment across full width.
+    const metricBlocks = [...article.children]
+      .filter(child => !child.classList.contains("bb-run-assessment"));
+
+    const main = document.createElement("div");
+    main.className = "bb-run-main";
+    metricBlocks.slice(0, 2).forEach(child => main.appendChild(child));
+
     const badge = document.createElement("div");
     badge.className = `bb-run-assessment is-${assessment.status}`;
     badge.innerHTML = `
       <span>${assessment.label}</span>
       <small>${assessment.reason}</small>
     `;
-    article.appendChild(badge);
+
+    article.classList.add("bb-run-card-with-assessment");
+    article.replaceChildren(main, badge);
   }
 
   function getNearestRecommendationRace() {
