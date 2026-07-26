@@ -459,29 +459,68 @@ body {
   margin-top: 18px;
 }
 
-/* v10.5.2 — Recent run assessment readability */
-#bbRunningPanel .logs article {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: start;
-  column-gap: 18px;
-  row-gap: 12px;
+/* v10.6 — Recent run card: metrics first row, assessment full-width second row */
+#bbRunningPanel .logs article.bb-run-card-with-assessment {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 14px !important;
+  align-items: stretch !important;
+  width: 100% !important;
 }
 
-#bbRunningPanel .logs article > div:nth-child(2) {
-  text-align: right;
+#bbRunningPanel .logs article.bb-run-card-with-assessment > .bb-run-main {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 20px !important;
+  align-items: start !important;
+  width: 100% !important;
 }
 
-#bbRunningPanel .logs article .bb-run-assessment {
-  grid-column: 1 / -1;
-  width: 100%;
-  margin-top: 0 !important;
-  box-sizing: border-box;
+#bbRunningPanel .logs article.bb-run-card-with-assessment > .bb-run-main > div {
+  min-width: 0 !important;
 }
 
-#bbRunningPanel .bb-run-assessment small {
+#bbRunningPanel .logs article.bb-run-card-with-assessment > .bb-run-main > div:last-child {
+  text-align: right !important;
+}
+
+#bbRunningPanel .logs article.bb-run-card-with-assessment > .bb-run-assessment {
+  display: grid !important;
+  grid-template-columns: max-content minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 11px 12px !important;
+  box-sizing: border-box !important;
+  text-align: left !important;
+}
+
+#bbRunningPanel .logs article.bb-run-card-with-assessment > .bb-run-assessment span {
+  display: inline-flex !important;
+  align-items: center !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+}
+
+#bbRunningPanel .logs article.bb-run-card-with-assessment > .bb-run-assessment small {
+  display: block !important;
+  min-width: 0 !important;
+  margin: 0 !important;
   font-size: 11px !important;
   line-height: 1.5 !important;
+  text-align: left !important;
   word-break: keep-all !important;
   overflow-wrap: break-word !important;
+}
+
+@media (max-width: 430px) {
+  #bbRunningPanel .logs article.bb-run-card-with-assessment > .bb-run-assessment {
+    grid-template-columns: 1fr !important;
+    gap: 7px !important;
+  }
+
+  #bbRunningPanel .logs article.bb-run-card-with-assessment > .bb-run-assessment span {
+    justify-self: start !important;
+  }
 }
